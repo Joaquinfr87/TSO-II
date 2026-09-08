@@ -42,6 +42,22 @@ docker compose up -d --build print
    docker compose exec print ls /var/spool/cups-pdf/OUT/
    ```
 
+## Comandos del cliente CUPS
+
+Los clientes (máquina con `cups-client` instalado) usan estos comandos para hablar con el servidor. Todos usan `-h <servidor>:<puerto>` para apuntar al CUPS remoto.
+
+| Comando | Qué hace |
+|---|---|
+| `lp -d PDF -h server:631 archivo` | Envía `archivo` a la impresora `PDF` |
+| `lpstat -h server:631 -p` | Lista las impresoras del servidor |
+| `lpstat -h server:631 -d` | Muestra la impresora por defecto |
+| `lpstat -h server:631 -o` | Lista los trabajos en la cola |
+| `lpq -h server:631` | Muestra la cola de espera |
+| `lprm -h server:631 123` | Cancela el trabajo `123` |
+| `lpadmin -h server:631 -p PDF -E` | Activa una impresora (admin) |
+
+> `lp` = *line printer*; es el comando estándar para imprimir en Unix/Linux. Envía el trabajo por el protocolo **IPP** (puerto 631) al servidor CUPS.
+
 ## Variables de entorno
 
 | Variable | Default | Descripción |
