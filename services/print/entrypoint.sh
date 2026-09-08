@@ -16,18 +16,27 @@ echo "${ADMIN_USER}:${ADMIN_PASS}" | chpasswd
 groupadd -f lpadmin
 usermod -aG lpadmin "$ADMIN_USER"
 
-# Asegurar que el directorio de salida de cups-pdf exista y sea accesible
-mkdir -p /var/spool/cups-pdf/OUT
+# Asegurar que los directorios necesarios existan
+mkdir -p /var/spool/cups-pdf/OUT /var/log/cups /var/run/cups
 chmod 1777 /var/spool/cups-pdf/OUT
+touch /var/log/cups/page_log
 
 # Iniciar el daemon CUPS en primer plano
 cupsd -f &
 CUPSD_PID=$!
 
+sleep 2
+
 # Esperar a que CUPS esté listo (reintentar hasta 15 veces)
+echo ">>> Esperando que CUPS inicie..."
 for i in $(seq 1 15); do
     if lpstat -h localhost:631 -r &>/dev/null; then
+        echo ">>> CUPS listo."
         break
+    fi
+    if ! kill -0 "$CUPSD_PID" 2>/dev/null; then
+        echo "ERROR: cupsd terminó inesperadamente"
+        exit 1
     fi
     sleep 1
 done
