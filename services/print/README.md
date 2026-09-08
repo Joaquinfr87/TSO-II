@@ -27,11 +27,11 @@ docker compose up -d --build print
 
 ## Verificación
 
-1. **Interfaz web**: acceder a `http://localhost:631` (usuario: `admin`, contraseña: `admin`).
+1. **Interfaz web**: acceder a `http://localhost:1631` (usuario: `admin`, contraseña: `admin`).
 2. **Imprimir una página de prueba**:
    ```bash
    # Desde el host
-   lp -d PDF -h localhost:631 archivo.txt
+   lp -d PDF -h localhost:${CUPS_PORT:-1631} archivo.txt
 
    # O desde otro contenedor en la red tso-net
    lp -d PDF -h tso-print:631 archivo.txt
@@ -46,7 +46,7 @@ docker compose up -d --build print
 
 | Variable | Default | Descripción |
 |---|---|---|
-| `CUPS_PORT` | `631` | Puerto en el host para la interfaz web de CUPS |
+| `CUPS_PORT` | `1631` | Puerto en el host para la interfaz web de CUPS (evita conflicto con CUPS del host) |
 | `CUPS_ADMIN_USER` | `admin` | Usuario administrador de CUPS |
 | `CUPS_ADMIN_PASS` | `admin` | Contraseña del administrador |
 
