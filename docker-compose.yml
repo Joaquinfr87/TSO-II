@@ -99,11 +99,28 @@ services:
     networks:
       - tso-net
 
+  # ------------------------------------------------------------------
+  # Servidor de impresión (CUPS + impresora virtual PDF)
+  # ------------------------------------------------------------------
+  print:
+    build: ./services/print
+    container_name: tso-print
+    ports:
+      - "${CUPS_PORT:-631}:631"
+    environment:
+      CUPS_ADMIN_USER: ${CUPS_ADMIN_USER:-admin}
+      CUPS_ADMIN_PASS: ${CUPS_ADMIN_PASS:-admin}
+    volumes:
+      - print_output:/var/spool/cups-pdf/OUT
+    networks:
+      - tso-net
+
 # Volúmenes con nombre: los datos persisten aunque los contenedores se borren.
 volumes:
   dns_zones:
   dhcp_state:
   mail_data:
+  print_output:
 
 # Red interna del proyecto.
 networks:

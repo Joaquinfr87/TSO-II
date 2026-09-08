@@ -26,6 +26,7 @@ Cada guía debe incluir:
 - [Instalación de Debian en el servidor](./instalacion-debian.md)
 - [Configuración inicial del servidor Debian](./configuracion-debian.md)
 - [Instalación de Docker en Debian](./instalacion-docker.md)
+- [Comandos esenciales de Docker](./comandos-docker.md)
 - [Uso colaborativo de Docker: flujo de trabajo con Docker Compose](./docker-compose-flujo.md)
 - [Instalar Zsh con Oh My Zsh](./zsh-ohmyzsh.md)
 - [Agregar usuarios y asignar privilegios](./agregar-usuarios.md)

@@ -22,6 +22,7 @@ Esta repo reúne documentación sobre la instalación y configuración de un ser
 │       ├── instalacion-debian.md
 │       ├── configuracion-debian.md
 │       ├── instalacion-docker.md
+│       ├── comandos-docker.md
 │       ├── docker-compose-flujo.md
 │       ├── zsh-ohmyzsh.md
 │       ├── agregar-usuarios.md
