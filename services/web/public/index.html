@@ -3,11 +3,819 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Servidor web TSO-II</title>
+    <title>Servidor Debian — TSO-II</title>
+    <meta name="description" content="Plataforma centralizada de servicios en contenedores Docker sobre Debian — Proyecto TSO-II">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════════
+           Design Tokens
+           ═══════════════════════════════════════════════════ */
+        :root {
+            --bg-primary: #000000;
+            --bg-surface: rgba(255, 255, 255, 0.03);
+            --bg-surface-hover: rgba(255, 255, 255, 0.06);
+            --text-primary: #fafafa;
+            --text-secondary: rgba(255, 255, 255, 0.55);
+            --text-tertiary: rgba(255, 255, 255, 0.35);
+            --accent-blue: #58a6ff;
+            --accent-glow: rgba(88, 166, 255, 0.12);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Reset & Base
+           ═══════════════════════════════════════════════════ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Starfield Canvas
+           ═══════════════════════════════════════════════════ */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Navigation
+           ═══════════════════════════════════════════════════ */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0 2rem;
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-brand svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: var(--accent-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 400;
+            padding: 0.4rem 0.75rem;
+            border-radius: 9999px;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface-hover);
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            transition: opacity 0.2s;
+        }
+
+        .nav-pill:hover {
+            opacity: 0.88;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Layout
+           ═══════════════════════════════════════════════════ */
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .container--narrow {
+            max-width: 720px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Hero Section
+           ═══════════════════════════════════════════════════ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, var(--bg-primary), transparent);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 1rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            background: var(--bg-surface);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .hero-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 600;
+            letter-spacing: -0.035em;
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease-out 0.15s both;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, #58a6ff 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.05rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 560px;
+            line-height: 1.6;
+            font-weight: 300;
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            animation: fadeInUp 0.8s ease-out 0.45s both;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .hero-meta .meta-icon {
+            font-size: 1rem;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Section Headings
+           ═══════════════════════════════════════════════════ */
+        .section {
+            padding: 6rem 0;
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+        }
+
+        .section-desc {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            max-width: 600px;
+            font-weight: 300;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Service Cards Grid
+           ═══════════════════════════════════════════════════ */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-top: 3rem;
+        }
+
+        .service-card {
+            background: var(--bg-primary);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease;
+            cursor: default;
+            min-height: 220px;
+        }
+
+        .service-card:hover {
+            background: var(--bg-surface-hover);
+        }
+
+        .card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.625rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .service-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .service-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            flex: 1;
+            font-weight: 300;
+        }
+
+        .card-endpoint {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-subtle);
+            font-size: 0.8rem;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .card-endpoint.active {
+            color: var(--accent-blue);
+        }
+
+        a.card-endpoint {
+            text-decoration: none;
+        }
+
+        a.card-endpoint:hover {
+            color: #7dbfff;
+        }
+
+        .card-endpoint .ep-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.6;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Architecture Section
+           ═══════════════════════════════════════════════════ */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .arch-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 0.875rem;
+            padding: 1.75rem;
+            transition: border-color 0.3s;
+        }
+
+        .arch-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .arch-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .arch-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .arch-card li {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .arch-card li::before {
+            content: '→';
+            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .arch-card code {
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent-blue);
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.82rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Divider
+           ═══════════════════════════════════════════════════ */
+        .divider {
+            height: 1px;
+            background: var(--border-subtle);
+            border: none;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Footer
+           ═══════════════════════════════════════════════════ */
+        footer {
+            padding: 3rem 0;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        .footer-inner code {
+            background: var(--bg-surface);
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Animations
+           ═══════════════════════════════════════════════════ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Responsive
+           ═══════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .arch-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Servidor web del proyecto TSO-II</h1>
-    <p>Este sitio es servido por Nginx dentro de un contenedor Docker.</p>
-    <p>El responsable del servicio debe reemplazar este contenido.</p>
+
+    <!-- Starfield Background -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/" class="nav-brand">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9 1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            sudoers.local
+        </a>
+        <div class="nav-links">
+            <a href="#servicios">Servicios</a>
+            <a href="#arquitectura">Arquitectura</a>
+            <a href="http://print.sudoers.local">Impresión</a>
+        </div>
+        <a href="http://print.sudoers.local" class="nav-pill">
+            Panel CUPS ↗
+        </a>
+    </nav>
+
+    <!-- Content -->
+    <div class="content">
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                Todos los servicios operativos
+            </div>
+            <h1>
+                Servidor<br><span class="highlight">Debian</span>
+            </h1>
+            <p class="hero-subtitle">
+                Infraestructura de red centralizada sobre contenedores Docker.
+                DNS, DHCP, correo, archivos, impresión y web en un solo equipo.
+            </p>
+            <div class="hero-meta">
+                <span><span class="meta-icon">🐧</span> Debian Bookworm</span>
+                <span><span class="meta-icon">🐳</span> Docker Compose</span>
+                <span><span class="meta-icon">🌐</span> sudoers.local</span>
+            </div>
+        </section>
+
+        <!-- Services -->
+        <section class="section" id="servicios">
+            <div class="container">
+                <span class="section-label reveal">Infraestructura</span>
+                <h2 class="section-title reveal">Servicios desplegados</h2>
+                <p class="section-desc reveal">
+                    Cada servicio corre en su propio contenedor aislado, gestionado
+                    mediante Docker Compose desde un único punto de entrada.
+                </p>
+
+                <div class="services-grid reveal">
+                    <div class="service-card">
+                        <div class="card-icon">🌐</div>
+                        <h3>Servidor Web</h3>
+                        <p>Nginx como servidor HTTP de alto rendimiento y proxy inverso hacia los demás servicios.</p>
+                        <a href="http://web.sudoers.local" class="card-endpoint active">
+                            <span class="ep-dot"></span>
+                            web.sudoers.local ↗
+                        </a>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="card-icon">🖨️</div>
+                        <h3>Impresión</h3>
+                        <p>CUPS con impresora virtual PDF para gestión de colas e impresión en red.</p>
+                        <a href="http://print.sudoers.local" class="card-endpoint active">
+                            <span class="ep-dot"></span>
+                            print.sudoers.local ↗
+                        </a>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="card-icon">🔍</div>
+                        <h3>DNS</h3>
+                        <p>Bind9 resolviendo el dominio sudoers.local y todos los subdominios de los servicios.</p>
+                        <div class="card-endpoint">
+                            <span class="ep-dot"></span>
+                            puerto 53 · UDP/TCP
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="card-icon">📁</div>
+                        <h3>Archivos</h3>
+                        <p>Samba como servidor de archivos compartidos accesible desde Windows, Linux y macOS.</p>
+                        <div class="card-endpoint">
+                            <span class="ep-dot"></span>
+                            puerto 445 / 139
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="card-icon">✉️</div>
+                        <h3>Correo Electrónico</h3>
+                        <p>Postfix para envío SMTP y Dovecot para recepción POP3/IMAP del dominio.</p>
+                        <div class="card-endpoint">
+                            <span class="ep-dot"></span>
+                            mail.sudoers.local
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="card-icon">⚡</div>
+                        <h3>DHCP</h3>
+                        <p>Kea DHCP asignando direcciones IP dinámicas y configuración de red a los clientes.</p>
+                        <div class="card-endpoint">
+                            <span class="ep-dot"></span>
+                            puerto 67 · UDP
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- Architecture -->
+        <section class="section" id="arquitectura">
+            <div class="container">
+                <span class="section-label reveal">Stack técnico</span>
+                <h2 class="section-title reveal">Arquitectura del servidor</h2>
+                <p class="section-desc reveal">
+                    Todos los contenedores comparten la red interna
+                    <code>tso-net</code> y se comunican por nombre de servicio.
+                </p>
+
+                <div class="arch-grid reveal">
+                    <div class="arch-card">
+                        <h3>🔗 Red interna</h3>
+                        <ul>
+                            <li>Bridge network <code>tso-net</code></li>
+                            <li>Resolución DNS entre contenedores</li>
+                            <li>Puertos mapeados al host sin conflictos</li>
+                            <li>Dominio <code>sudoers.local</code></li>
+                        </ul>
+                    </div>
+                    <div class="arch-card">
+                        <h3>💾 Persistencia</h3>
+                        <ul>
+                            <li>Volúmenes con nombre: <code>dns_zones</code>, <code>mail_data</code></li>
+                            <li>Datos sobreviven a recreaciones de contenedor</li>
+                            <li>Configuraciones versionadas en el repositorio</li>
+                            <li>Secretos locales en <code>.env</code> (gitignored)</li>
+                        </ul>
+                    </div>
+                    <div class="arch-card">
+                        <h3>🚀 Despliegue</h3>
+                        <ul>
+                            <li><code>docker compose up -d --build</code></li>
+                            <li>Imágenes con versión fija (no <code>latest</code>)</li>
+                            <li>Un solo <code>docker-compose.yml</code> como fuente de verdad</li>
+                            <li>Reproducible en cualquier máquina con Docker</li>
+                        </ul>
+                    </div>
+                    <div class="arch-card">
+                        <h3>👥 Equipo</h3>
+                        <ul>
+                            <li>DNS + Correo — Joaquín</li>
+                            <li>Web + Archivos — David</li>
+                            <li>DHCP + Base de datos — Nicolás</li>
+                            <li>Cada integrante edita solo su servicio</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="footer-inner">
+                    <span>Sistemas Operativos II — Servidor Debian</span>
+                    <code>sudoers.local</code>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Starfield Animation -->
+    <script>
+        (() => {
+            const canvas = document.getElementById('starfield');
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+            const STAR_COUNT = 180;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            function init() {
+                resize();
+                stars = [];
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        r: Math.random() * 1.2 + 0.3,
+                        alpha: Math.random() * 0.6 + 0.1,
+                        speed: Math.random() * 0.15 + 0.02,
+                        drift: (Math.random() - 0.5) * 0.08,
+                        pulse: Math.random() * Math.PI * 2,
+                        pulseSpeed: Math.random() * 0.01 + 0.003
+                    });
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Subtle radial glow in center
+                const grd = ctx.createRadialGradient(
+                    canvas.width / 2, canvas.height * 0.4, 0,
+                    canvas.width / 2, canvas.height * 0.4, canvas.width * 0.5
+                );
+                grd.addColorStop(0, 'rgba(88, 166, 255, 0.015)');
+                grd.addColorStop(0.5, 'rgba(167, 139, 250, 0.008)');
+                grd.addColorStop(1, 'transparent');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (const s of stars) {
+                    s.pulse += s.pulseSpeed;
+                    const flicker = 0.5 + 0.5 * Math.sin(s.pulse);
+                    const a = s.alpha * flicker;
+
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${a})`;
+                    ctx.fill();
+
+                    s.y -= s.speed;
+                    s.x += s.drift;
+
+                    if (s.y < -5) {
+                        s.y = canvas.height + 5;
+                        s.x = Math.random() * canvas.width;
+                    }
+                    if (s.x < -5) s.x = canvas.width + 5;
+                    if (s.x > canvas.width + 5) s.x = -5;
+                }
+
+                requestAnimationFrame(draw);
+            }
+
+            window.addEventListener('resize', resize);
+            init();
+            draw();
+        })();
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
 </body>
 </html>

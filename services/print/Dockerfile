@@ -14,7 +14,7 @@ RUN apt-get update && \
 
 COPY cupsd.conf /etc/cups/cupsd.conf
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 # Puerto de la interfaz web de CUPS
 EXPOSE 631

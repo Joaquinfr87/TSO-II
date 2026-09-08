@@ -39,9 +39,11 @@ Sustituir el contenido de `public/` por el sitio real del proyecto.
 
 ## Estado
 
-- [ ] Cambiar el contenido por defecto (`public/`)
-- [ ] Ajustar el virtual host a un `server_name` real
-- [ ] Configurar HTTPS si se requiere en la red
+- [x] Configuración de Virtual Hosts para `web.sudoers.local`, `www.sudoers.local` y `sudoers.local`
+- [x] Proxy inverso configurado hacia el servicio de impresión CUPS (`print.sudoers.local` -> `http://tso-print:631`)
+- [x] Configuración de `default_server` para capturar peticiones no mapeadas
+- [x] Landing page moderna del proyecto en `public/index.html`
+- [ ] Configurar HTTPS con certificados SSL si se requiere más adelante
 
 ## Referencias
 
