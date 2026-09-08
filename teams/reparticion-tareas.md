@@ -16,10 +16,11 @@ Este documento define cómo se reparten los servicios de la materia entre los in
 ## Repartición de servicios
 
 | Servicio | Tecnología elegida | Integrante | Estado |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Servidor de correo | Postfix + Dovecot | Joaquín | En desarrollo |
-| DNS | Bind9 | Nicolás | En desarrollo |
+| DNS | Bind9 | Joaquín | En desarrollo |
 | DHCP | Kea | Nicolás | En desarrollo |
+| Base Datos | Postgre | Nicolás | En desarrollo |
 | Servidor web | Nginx | David | En desarrollo |
 | Servidor de archivos | Samba | David | En desarrollo |
 | IIS | Ver decisión abajo | — | Bloqueado por plataforma |
@@ -34,7 +35,7 @@ La consigna incluye **IIS** y un **controlador de dominio** (Active Directory). 
 Las opciones reales:
 
 | Rol pedido | Opción alineada a Docker/Linux | Opción alternativa fuera de Docker |
-|---|---|---|
+| --- | --- | --- |
 | Servidor web (IIS) | Nginx (mismo rol: servidor HTTP) | Máquina virtual Windows Server |
 | Controlador de dominio (AD) | Samba como controlador de dominio de red (Kerberos/LDAP) | Máquina virtual Windows Server |
 
