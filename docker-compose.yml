@@ -21,7 +21,7 @@ services:
   # (ej: http://dns)
 
   # ------------------------------------------------------------------
-  # DNS (Bind9) — Nicolás
+  # DNS (Bind9) — Joaquín
   # ------------------------------------------------------------------
   dns:
     build: ./services/dns
@@ -32,7 +32,8 @@ services:
       - "53:53/udp"
       - "53:53/tcp"
     environment:
-      DNS_DOMAIN: ${DNS_DOMAIN:-tsolab.local}
+      DNS_DOMAIN: ${DNS_DOMAIN:-sudoers.local}
+      DNS_SERVER_IP: ${DNS_SERVER_IP:-}
     volumes:
       - dns_zones:/etc/bind/zones
     networks:
@@ -93,7 +94,7 @@ services:
       - "110:110"      # POP3 (Dovecot)
       - "143:143"      # IMAP (Dovecot)
     environment:
-      MAIL_DOMAIN: ${MAIL_DOMAIN:-mail.tsolab.local}
+      MAIL_DOMAIN: ${MAIL_DOMAIN:-mail.sudoers.local}
     volumes:
       - mail_data:/var/mail
     networks:

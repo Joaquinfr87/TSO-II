@@ -77,7 +77,7 @@ Los clientes (máquina con `cups-client` instalado) usan estos comandos para hab
 
 ## Interacción con otros servicios
 
-- **DNS**: puede registrar un hostname `print.tsolab.local` apuntando al servidor.
+- **DNS**: puede registrar un hostname `print.sudoers.local` apuntando al servidor.
 - **Samba**: se puede compartir la impresora virtual vía SMB para clientes Windows.
 
 ## Referencias
