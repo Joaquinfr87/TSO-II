@@ -19,6 +19,7 @@ Cada tema puede tener su propio archivo cuando la descripción exceda un breve r
 
 - [Fundamentos teóricos de un servidor Debian](./teoria-base.md)
 - [Usuarios, grupos y permisos](./usuarios-y-permisos.md)
+- [Jerarquía del sistema de archivos](./sistema-de-archivos.md)
 
 ## Notas iniciales
 

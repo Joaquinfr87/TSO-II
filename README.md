@@ -11,7 +11,8 @@ Esta repo reúne documentación sobre la instalación y configuración de un ser
     ├── theory
     │   ├── index.md
     │   ├── teoria-base.md
-    │   └── usuarios-y-permisos.md
+    │   ├── usuarios-y-permisos.md
+    │   └── sistema-de-archivos.md
     └── guides
         ├── index.md
         ├── instalacion-debian.md
