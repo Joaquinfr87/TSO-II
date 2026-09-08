@@ -6,6 +6,8 @@ Esta carpeta contiene las guías paso a paso para instalar y configurar un servi
 
 - Instalación de Debian en el servidor.
 - Configuración inicial del sistema operativo.
+- Instalación de Docker y uso de Docker Compose.
+- Instalación y configuración de Zsh con Oh My Zsh.
 - Configuración de red y acceso remoto.
 - Servicios básicos y ajustes de producción.
 - Buenas prácticas de mantenimiento y seguridad.
@@ -23,6 +25,9 @@ Cada guía debe incluir:
 
 - [Instalación de Debian en el servidor](./instalacion-debian.md)
 - [Configuración inicial del servidor Debian](./configuracion-debian.md)
+- [Instalación de Docker en Debian](./instalacion-docker.md)
+- [Uso colaborativo de Docker: flujo de trabajo con Docker Compose](./docker-compose-flujo.md)
+- [Instalar Zsh con Oh My Zsh](./zsh-ohmyzsh.md)
 - [Agregar usuarios y asignar privilegios](./agregar-usuarios.md)
 - [Evitar la suspensión al cerrar la tapa (laptop como servidor)](./laptop-siempre-encendida.md)
 - [Instalar paquetes en un servidor sin internet: proxy APT y NAT](./proxy-apt-y-nat.md)

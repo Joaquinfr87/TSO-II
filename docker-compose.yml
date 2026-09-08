@@ -1,0 +1,118 @@
+# docker-compose.yml — Punto de entrada del proyecto TSO-II
+#
+# Declara todos los servicios del proyecto. La fuente de verdad es este archivo.
+# Cada servicio tiene su definición (Dockerfile y configuración) en services/<nombre>.
+#
+# Uso:
+#   docker compose up -d --build        levantar todo
+#   docker compose up -d <servicio>      levantar un servicio puntual
+#   docker compose down                  detener (sin borrar datos)
+#
+# Variables de entorno por máquina: copiar .env.example a .env y completar.
+# Ver: docs/guides/docker-compose-flujo.md y teams/
+
+name: tso-ii
+
+services:
+  # ------------------------------------------------------------------
+  # Red compartida entre los servicios del proyecto
+  # ------------------------------------------------------------------
+  # Los contenedores se comunican entre sí por el nombre de servicio
+  # (ej: http://dns)
+
+  # ------------------------------------------------------------------
+  # DNS (Bind9) — Nicolás
+  # ------------------------------------------------------------------
+  dns:
+    build: ./services/dns
+    container_name: tso-dns
+    # 53/udp: resolución DNS para la red local
+    # 53/tcp: transferencias de zona
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    environment:
+      DNS_DOMAIN: ${DNS_DOMAIN:-tsolab.local}
+    volumes:
+      - dns_zones:/etc/bind/zones
+    networks:
+      - tso-net
+
+  # ------------------------------------------------------------------
+  # DHCP (Kea) — Nicolás
+  # ------------------------------------------------------------------
+  dhcp:
+    build: ./services/dhcp
+    container_name: tso-dhcp
+    # 67/udp: descubrimiento y oferta DHCP
+    ports:
+      - "67:67/udp"
+    environment:
+      DHCP_SUBNET: ${DHCP_SUBNET:-192.168.1.0/24}
+      DHCP_DNS: ${HOST_IP:-192.168.1.10}
+    volumes:
+      - dhcp_state:/var/lib/kea
+    networks:
+      - tso-net
+
+  # ------------------------------------------------------------------
+  # Servidor web (Nginx) — David
+  # ------------------------------------------------------------------
+  web:
+    build: ./services/web
+    container_name: tso-web
+    ports:
+      - "${WEB_PORT_HTTP:-8080}:80"
+    volumes:
+      - ${WEB_SITE_DIR:-./services/web/public}:/usr/share/nginx/html:ro
+    networks:
+      - tso-net
+
+  # ------------------------------------------------------------------
+  # Servidor de archivos (Samba) — David
+  # ------------------------------------------------------------------
+  files:
+    build: ./services/files
+    container_name: tso-files
+    ports:
+      - "${SMB_PORT_445:-445}:445"
+      - "139:139"
+    volumes:
+      - ${FILES_SHARE_DIR:-./services/files/data}:/srv/share
+    networks:
+      - tso-net
+
+  # ------------------------------------------------------------------
+  # Servidor de correo (Postfix + Dovecot) — Joaquín
+  # ------------------------------------------------------------------
+  mail:
+    build: ./services/mail
+    container_name: tso-mail
+    ports:
+      - "25:25"        # SMTP
+      - "110:110"      # POP3 (Dovecot)
+      - "143:143"      # IMAP (Dovecot)
+    environment:
+      MAIL_DOMAIN: ${MAIL_DOMAIN:-mail.tsolab.local}
+    volumes:
+      - mail_data:/var/mail
+    networks:
+      - tso-net
+
+# Volúmenes con nombre: los datos persisten aunque los contenedores se borren.
+volumes:
+  dns_zones:
+  dhcp_state:
+  mail_data:
+
+# Red interna del proyecto.
+networks:
+  tso-net:
+    driver: bridge
+
+# NOTA sobre IIS y controlador de dominio:
+# IIS y un controlador de dominio con Active Directory son tecnologías de
+# Microsoft pensadas para el kernel de Windows. Docker sobre Debian usa el
+# kernel de Linux, por lo que esos roles NO pueden desplegarse como
+# contenedores en esta máquina.
+# - Ver la discusión completa y alternativas en teams/reparticion-tareas.md.
