@@ -68,16 +68,17 @@ Tu máquina                DNS (Bind9)              Internet
 | Variable | Default | Descripción |
 |---|---|---|
 | `DNS_DOMAIN` | `sudoers.local` | Dominio interno a resolver |
-| `DNS_SERVER_IP` | (auto-detectada) | IP del servidor DNS. Si está vacío, se detecta automáticamente |
+| `DNS_IP_WLO1` | (auto-detectada) | IP de la interfaz WiFi (wlo1). Si está vacío, se detecta automáticamente |
+| `DNS_IP_ENO1` | (auto-detectada) | IP de la interfaz LAN (eno1). Si está vacío, se detecta automáticamente |
 
 ## Uso
 
 ```bash
-# Levantar el servidor DNS (auto-detecta IP)
+# Levantar el servidor DNS (auto-detecta IPs)
 docker compose up -d --build dns
 
-# O especificar la IP manualmente
-DNS_SERVER_IP=192.168.1.10 docker compose up -d --build dns
+# O especificar las IPs manualmente
+DNS_IP_WLO1=192.168.0.105 DNS_IP_ENO1=172.16.0.16 docker compose up -d --build dns
 
 # Ver logs en tiempo real
 docker compose logs -f dns
@@ -104,38 +105,47 @@ dig @localhost sudoers.local ANY
 
 ## Servidor con múltiples interfaces (WiFi + LAN)
 
-Si tu servidor tiene dos interfaces de red (WiFi y LAN), el entrypoint detectará automáticamente la IP de la interfaz por defecto (la que tiene ruta hacia Internet).
+El DNS usa **Views** de Bind9 para dar respuestas diferentes según la red del cliente:
 
-Para usar una IP específica:
+```
+Cliente en wlo1 (192.168.0.x)  →  print.sudoers.local = 192.168.0.105
+Cliente en eno1 (172.16.x.x)  →  print.sudoers.local = 172.16.0.16
+```
+
+Cada cliente recibe la IP correcta para su red automáticamente.
+
+### Configurar IPs manualmente
 
 ```bash
-# Especificar la IP de la interfaz LAN
-DNS_SERVER_IP=192.168.1.10 docker compose up -d --build dns
+# En .env
+DNS_IP_WLO1=192.168.0.105
+DNS_IP_ENO1=172.16.0.16
+```
 
-# O configurar en .env
-echo "DNS_SERVER_IP=192.168.1.10" >> .env
+### Auto-detección
+
+Si dejás las variables vacías, el entrypoint detecta las IPs automáticamente:
+
+```bash
+# Detecta IPs de wlo1 y eno1
 docker compose up -d --build dns
 ```
 
-El DNS escuchará en **todas las interfaces** (0.0.0.0:53), así que será accesible desde ambas redes.
-
 ## Agregar un registro nuevo
 
-1. Abrí `zones/db.sudoers.local`
-2. Agregá la línea con el registro deseado:
-   ```
-   # Servidor de base de datos
-   db             IN      A       192.168.1.20
-   ```
-3. Incrementá el **Serial** (ej: de `2026090801` a `2026090802`)
-4. Recargá Bind9 sin reiniciar el contenedor:
-   ```bash
-   docker compose exec dns rndc reload
-   ```
-5. Probá:
-   ```bash
-   dig @localhost db.sudoers.local
-   ```
+Los archivos de zona se generan automáticamente al iniciar el contenedor. Para agregar un registro nuevo, editá el `entrypoint.sh` y agregá la línea en la función `generar_zona()`:
+
+```bash
+# Ejemplo: agregar servidor de base de datos
+db             IN      A       ${IP}
+```
+
+Después reiniciá el contenedor:
+
+```bash
+docker compose down
+docker compose up -d --build dns
+```
 
 ## Apuntar tu máquina al DNS
 

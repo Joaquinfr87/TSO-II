@@ -33,7 +33,8 @@ services:
       - "53:53/tcp"
     environment:
       DNS_DOMAIN: ${DNS_DOMAIN:-sudoers.local}
-      DNS_SERVER_IP: ${DNS_SERVER_IP:-}
+      DNS_IP_WLO1: ${DNS_IP_WLO1:-}
+      DNS_IP_ENO1: ${DNS_IP_ENO1:-}
     volumes:
       - dns_zones:/etc/bind/zones
     networks:
