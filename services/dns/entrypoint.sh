@@ -6,7 +6,7 @@ set -e
 # Soporta 2 redes simultáneas (wlo1 + eno1)
 # ========================================
 
-DOMAIN="${DNS_DOMAIN:-sudoers.local}"
+DOMAIN="${DNS_DOMAIN:-sudoers.lan}"
 IP_WLO1="${DNS_IP_WLO1:-}"
 IP_ENO1="${DNS_IP_ENO1:-}"
 ZONES_DIR="/etc/bind/zones"

@@ -8,7 +8,7 @@ Servidor DNS para el dominio interno del proyecto, basado en Bind9.
 
 ## Propósito
 
-Resolver los nombres de los servicios del proyecto dentro del dominio interno `sudoers.local` y servir como DNS de la red local.
+Resolver los nombres de los servicios del proyecto dentro del dominio interno `sudoers.lan` y servir como DNS de la red local.
 
 ## Archivos
 
@@ -16,37 +16,37 @@ Resolver los nombres de los servicios del proyecto dentro del dominio interno `s
 |---|---|
 | `Dockerfile` | Construcción de la imagen con Bind9 |
 | `named.conf` | Configuración principal: zonas que administra el servidor |
-| `zones/db.sudoers.local` | **Zona directa**: resuelve nombres → IPs |
+| `zones/db.sudoers.lan` | **Zona directa**: resuelve nombres → IPs |
 | `zones/db.1.168.192` | **Zona inversa**: resuelve IPs → nombres |
 
 ## Teoría esencial
 
 ### ¿Qué es un servidor DNS?
 
-DNS (Domain Name System) es el sistema que traduce nombres legibles (`web.sudoers.local`) a direcciones IP (`192.168.1.10`). Sin DNS, tendrías que recordar la IP de cada servicio.
+DNS (Domain Name System) es el sistema que traduce nombres legibles (`web.sudoers.lan`) a direcciones IP (`192.168.1.10`). Sin DNS, tendrías que recordar la IP de cada servicio.
 
 ### Tipos de registros más comunes
 
 | Registro | Qué hace | Ejemplo |
 |---|---|---|
-| **A** | Nombre → IPv4 | `web.sudoers.local. IN A 192.168.1.10` |
-| **AAAA** | Nombre → IPv6 | `web.sudoers.local. IN AAAA ::1` |
-| **PTR** | IP → nombre (inversa) | `10 IN PTR web.sudoers.local.` |
-| **NS** | Nameserver del dominio | `@ IN NS ns1.sudoers.local.` |
-| **MX** | Servidor de correo | `@ IN MX 10 mail.sudoers.local.` |
-| **CNAME** | Alias de otro nombre | `www IN CNAME web.sudoers.local.` |
+| **A** | Nombre → IPv4 | `web.sudoers.lan. IN A 192.168.1.10` |
+| **AAAA** | Nombre → IPv6 | `web.sudoers.lan. IN AAAA ::1` |
+| **PTR** | IP → nombre (inversa) | `10 IN PTR web.sudoers.lan.` |
+| **NS** | Nameserver del dominio | `@ IN NS ns1.sudoers.lan.` |
+| **MX** | Servidor de correo | `@ IN MX 10 mail.sudoers.lan.` |
+| **CNAME** | Alias de otro nombre | `www IN CNAME web.sudoers.lan.` |
 
 ### Zona directa vs inversa
 
-- **Directa** (`db.sudoers.local`): cuando preguntás `¿Cuál es la IP de web?`, el servidor busca el registro A y responde `192.168.1.10`.
-- **Inversa** (`db.1.168.192`): cuando preguntás `¿Qué nombre tiene la IP 192.168.1.10?`, el servidor busca el registro PTR y responde `web.sudoers.local`.
+- **Directa** (`db.sudoers.lan`): cuando preguntás `¿Cuál es la IP de web?`, el servidor busca el registro A y responde `192.168.1.10`.
+- **Inversa** (`db.1.168.192`): cuando preguntás `¿Qué nombre tiene la IP 192.168.1.10?`, el servidor busca el registro PTR y responde `web.sudoers.lan`.
 
 ### Cómo funciona una consulta DNS
 
 ```
 Tu máquina                DNS (Bind9)              Internet
     |                         |                        |
-    |--- "web.sudoers.local" ->|                        |
+    |--- "web.sudoers.lan" ->|                        |
     |                         |-- ¿Está en mi zona? --|
     |                         |   Sí: 192.168.1.10    |
     |<-- 192.168.1.10 --------|                        |
@@ -67,7 +67,7 @@ Tu máquina                DNS (Bind9)              Internet
 
 | Variable | Default | Descripción |
 |---|---|---|
-| `DNS_DOMAIN` | `sudoers.local` | Dominio interno a resolver |
+| `DNS_DOMAIN` | `sudoers.lan` | Dominio interno a resolver |
 | `DNS_IP_WLO1` | (auto-detectada) | IP de la interfaz WiFi (wlo1). Si está vacío, se detecta automáticamente |
 | `DNS_IP_ENO1` | (auto-detectada) | IP de la interfaz LAN (eno1). Si está vacío, se detecta automáticamente |
 
@@ -88,19 +88,19 @@ docker compose logs -f dns
 
 ```bash
 # Resolver un nombre contra el servidor DNS
-dig @localhost sudoers.local
+dig @localhost sudoers.lan
 
 # Verificar un registro específico
-dig @localhost web.sudoers.local
+dig @localhost web.sudoers.lan
 
 # Verificar resolución inversa
 dig @localhost -x 192.168.1.10
 
 # Consulta verbose (muestra más detalle)
-dig @localhost web.sudoers.local +noall +answer
+dig @localhost web.sudoers.lan +noall +answer
 
 # Ver todos los registros de un dominio
-dig @localhost sudoers.local ANY
+dig @localhost sudoers.lan ANY
 ```
 
 ## Servidor con múltiples interfaces (WiFi + LAN)
@@ -108,8 +108,8 @@ dig @localhost sudoers.local ANY
 El DNS usa **Views** de Bind9 para dar respuestas diferentes según la red del cliente:
 
 ```
-Cliente en wlo1 (192.168.0.x)  →  print.sudoers.local = 192.168.0.105
-Cliente en eno1 (172.16.x.x)  →  print.sudoers.local = 172.16.0.16
+Cliente en wlo1 (192.168.0.x)  →  print.sudoers.lan = 192.168.0.105
+Cliente en eno1 (172.16.x.x)  →  print.sudoers.lan = 172.16.0.16
 ```
 
 Cada cliente recibe la IP correcta para su red automáticamente.
@@ -159,7 +159,7 @@ O configurá la interfaz de red para que use esta IP como DNS primario.
 
 ## Estado
 
-- [x] Configurar zona directa (`zones/db.sudoers.local`)
+- [x] Configurar zona directa (`zones/db.sudoers.lan`)
 - [x] Configurar zona inversa (`zones/db.1.168.192`)
 - [x] Registros de todos los servicios (web, mail, files, print, dns, dhcp)
 - [x] Registro MX para correo

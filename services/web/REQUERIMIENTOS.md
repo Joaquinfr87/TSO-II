@@ -10,12 +10,12 @@ Nginx sirve contenido estático desde `/usr/share/nginx/html/`.
 
 ### 1. Proxy inverso para CUPS (Impresión)
 
-Cuando alguien acceda a `print.sudoers.local`, Nginx debe redirigir al servidor de impresión.
+Cuando alguien acceda a `print.sudoers.lan`, Nginx debe redirigir al servidor de impresión.
 
 ```nginx
 server {
     listen 80;
-    server_name print.sudoers.local;
+    server_name print.sudoers.lan;
 
     location / {
         proxy_pass http://tso-print:631;
@@ -36,7 +36,7 @@ El sitio principal debe seguir funcionando:
 ```nginx
 server {
     listen 80;
-    server_name web.sudoers.local www.sudoers.local sudoers.local;
+    server_name web.sudoers.lan www.sudoers.lan sudoers.lan;
 
     root /usr/share/nginx/html;
     index index.html;
@@ -71,9 +71,9 @@ El servidor DNS (Bind9) ya tiene configurados estos registros:
 
 | Subdominio | IP |
 |---|---|
-| web.sudoers.local | 192.168.0.105 / 172.16.0.16 |
-| print.sudoers.local | 192.168.0.105 / 172.16.0.16 |
-| mail.sudoers.local | 192.168.0.105 / 172.16.0.16 |
+| web.sudoers.lan | 192.168.0.105 / 172.16.0.16 |
+| print.sudoers.lan | 192.168.0.105 / 172.16.0.16 |
+| mail.sudoers.lan | 192.168.0.105 / 172.16.0.16 |
 
 ## Docker Compose
 
@@ -101,7 +101,7 @@ docker compose up -d --build web
 curl http://localhost:8080
 
 # Probar proxy a CUPS (desde otra máquina o con DNS configurado)
-curl http://print.sudoers.local
+curl http://print.sudoers.lan
 
 # Ver logs
 docker compose logs -f web

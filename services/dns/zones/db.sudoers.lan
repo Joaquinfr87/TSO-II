@@ -1,6 +1,6 @@
-; Zona directa para sudoers.local
+; Zona directa para sudoers.lan
 $TTL    604800
-@       IN      SOA     ns1.sudoers.local. admin.sudoers.local. (
+@       IN      SOA     ns1.sudoers.lan. admin.sudoers.lan. (
                         2026090801      ; Serial (YYYYMMDDNN)
                         604800          ; Refresh
                         86400           ; Retry
@@ -8,7 +8,7 @@ $TTL    604800
                         604800 )        ; Negative Cache TTL
 
 ; Nameservers
-@               IN      NS      ns1.sudoers.local.
+@               IN      NS      ns1.sudoers.lan.
 
 ; Registros A - Servidores
 ns1             IN      A       192.168.1.10
@@ -21,7 +21,7 @@ mail            IN      A       192.168.1.10
 print           IN      A       192.168.1.10
 
 ; Registro MX - Correo
-@               IN      MX      10 mail.sudoers.local.
+@               IN      MX      10 mail.sudoers.lan.
 
 ; Registro CNAME (alias)
-sudoers         IN      CNAME   www.sudoers.local.
+sudoers         IN      CNAME   www.sudoers.lan.
