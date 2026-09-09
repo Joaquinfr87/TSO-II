@@ -25,6 +25,13 @@ Cada tema puede tener su propio archivo cuando la descripción exceda un breve r
 - [Usuarios, grupos y permisos](./usuarios-y-permisos.md)
 - [Jerarquía del sistema de archivos](./sistema-de-archivos.md)
 
+## Red y servicios
+
+- [DNS: Domain Name System](./dns.md)
+- [DHCP: Dynamic Host Configuration Protocol](./dhcp.md)
+- [Servidores web, Nginx y proxy inverso](./web-y-proxy.md)
+- [Dominios y resolución de nombres](./dominios.md)
+
 ## Notas iniciales
 
 Esta sección está en construcción. Agregar contenido nuevo según sea necesario y mantener un lenguaje objetivo, con definiciones claras y referencias prácticas cuando aplique.
