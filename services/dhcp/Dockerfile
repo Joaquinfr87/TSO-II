@@ -9,6 +9,10 @@ RUN apt-get update && \
 
 COPY kea-dhcp4.conf /etc/kea/kea-dhcp4.conf
 
+# Copiar entrypoint (aplica variables del .env a la plantilla)
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 67/udp
 
-CMD ["/usr/sbin/kea-dhcp4", "-c", "/etc/kea/kea-dhcp4.conf"]
+CMD ["/entrypoint.sh"]
