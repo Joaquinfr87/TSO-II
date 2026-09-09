@@ -84,6 +84,7 @@ services:
     build: ./services/web
     container_name: tso-web
     ports:
+      - "80:80"
       - "${WEB_PORT_HTTP:-8080}:80"
     volumes:
       - ${WEB_SITE_DIR:-./services/web/public}:/usr/share/nginx/html:ro
