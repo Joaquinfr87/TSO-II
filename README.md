@@ -31,6 +31,7 @@ Esta repo reúne documentación sobre la instalación y configuración de un ser
 ├── services                  ← Dockerfiles y configuración por servicio
 │   ├── dns/                  ← Bind9 (Nicolás)
 │   ├── dhcp/                 ← Kea (Nicolás)
+│   ├── database/             ← PostgreSQL (Nicolás)
 │   ├── web/                  ← Nginx (David)
 │   ├── files/                ← Samba (David)
 │   ├── mail/                 ← Postfix + Dovecot (Joaquín)
