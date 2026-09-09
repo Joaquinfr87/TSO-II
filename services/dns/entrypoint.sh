@@ -97,6 +97,7 @@ EOF
 cat > /etc/bind/named.conf << 'EOF'
 // named.conf — Bind9 con Views
 // Generado automáticamente por entrypoint.sh
+include "/etc/bind/named.conf.options";
 
 EOF
 
