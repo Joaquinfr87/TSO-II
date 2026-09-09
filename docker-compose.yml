@@ -32,7 +32,7 @@ services:
       - "53:53/udp"
       - "53:53/tcp"
     environment:
-      DNS_DOMAIN: ${DNS_DOMAIN:-sudoers.local}
+      DNS_DOMAIN: ${DNS_DOMAIN:-sudoers.lan}
       DNS_IP_WLO1: ${DNS_IP_WLO1:-}
       DNS_IP_ENO1: ${DNS_IP_ENO1:-}
     volumes:
@@ -53,7 +53,7 @@ services:
       DHCP_SUBNET: ${DHCP_SUBNET:-192.168.1.0/24}
       DHCP_POOL: ${DHCP_POOL:-192.168.1.100 - 192.168.1.200}
       DHCP_DNS: ${DHCP_DNS:-192.168.1.10}
-      DNS_DOMAIN: ${DNS_DOMAIN:-sudoers.local}
+      DNS_DOMAIN: ${DNS_DOMAIN:-sudoers.lan}
       HOST_IP: ${HOST_IP:-192.168.1.10}
     volumes:
       - dhcp_state:/var/lib/kea
@@ -115,7 +115,7 @@ services:
       - "110:110"      # POP3 (Dovecot)
       - "143:143"      # IMAP (Dovecot)
     environment:
-      MAIL_DOMAIN: ${MAIL_DOMAIN:-mail.sudoers.local}
+      MAIL_DOMAIN: ${MAIL_DOMAIN:-mail.sudoers.lan}
     volumes:
       - mail_data:/var/mail
     networks:

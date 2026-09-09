@@ -75,7 +75,7 @@ Opciones para que DHCP responda en una red real (a evaluar cuando se pruebe con 
 | `DHCP_SUBNET` | `192.168.1.0/24` | Red que atiende el servidor |
 | `DHCP_POOL` | `192.168.1.100 - 192.168.1.200` | Rango de IPs que entrega a los clientes |
 | `DHCP_DNS` | `192.168.1.10` | IP del servidor DNS que se anuncia a los clientes |
-| `DNS_DOMAIN` | `sudoers.local` | Dominio interno del proyecto |
+| `DNS_DOMAIN` | `sudoers.lan` | Dominio interno del proyecto |
 | `HOST_IP` | `192.168.1.10` | IP del servidor; se anuncia como puerta de enlace (`routers`) |
 
 ## Estado

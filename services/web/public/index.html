@@ -560,14 +560,14 @@
     <nav>
         <a href="/" class="nav-brand">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9 1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-            sudoers.local
+            sudoers.lan
         </a>
         <div class="nav-links">
             <a href="#servicios">Servicios</a>
             <a href="#arquitectura">Arquitectura</a>
-            <a href="http://print.sudoers.local">Impresión</a>
+            <a href="http://print.sudoers.lan">Impresión</a>
         </div>
-        <a href="http://print.sudoers.local" class="nav-pill">
+        <a href="http://print.sudoers.lan" class="nav-pill">
             Panel CUPS ↗
         </a>
     </nav>
@@ -591,7 +591,7 @@
             <div class="hero-meta">
                 <span><span class="meta-icon">🐧</span> Debian Bookworm</span>
                 <span><span class="meta-icon">🐳</span> Docker Compose</span>
-                <span><span class="meta-icon">🌐</span> sudoers.local</span>
+                <span><span class="meta-icon">🌐</span> sudoers.lan</span>
             </div>
         </section>
 
@@ -610,9 +610,9 @@
                         <div class="card-icon">🌐</div>
                         <h3>Servidor Web</h3>
                         <p>Nginx como servidor HTTP de alto rendimiento y proxy inverso hacia los demás servicios.</p>
-                        <a href="http://web.sudoers.local" class="card-endpoint active">
+                        <a href="http://web.sudoers.lan" class="card-endpoint active">
                             <span class="ep-dot"></span>
-                            web.sudoers.local ↗
+                            web.sudoers.lan ↗
                         </a>
                     </div>
 
@@ -620,16 +620,16 @@
                         <div class="card-icon">🖨️</div>
                         <h3>Impresión</h3>
                         <p>CUPS con impresora virtual PDF para gestión de colas e impresión en red.</p>
-                        <a href="http://print.sudoers.local" class="card-endpoint active">
+                        <a href="http://print.sudoers.lan" class="card-endpoint active">
                             <span class="ep-dot"></span>
-                            print.sudoers.local ↗
+                            print.sudoers.lan ↗
                         </a>
                     </div>
 
                     <div class="service-card">
                         <div class="card-icon">🔍</div>
                         <h3>DNS</h3>
-                        <p>Bind9 resolviendo el dominio sudoers.local y todos los subdominios de los servicios.</p>
+                        <p>Bind9 resolviendo el dominio sudoers.lan y todos los subdominios de los servicios.</p>
                         <div class="card-endpoint">
                             <span class="ep-dot"></span>
                             puerto 53 · UDP/TCP
@@ -652,7 +652,7 @@
                         <p>Postfix para envío SMTP y Dovecot para recepción POP3/IMAP del dominio.</p>
                         <div class="card-endpoint">
                             <span class="ep-dot"></span>
-                            mail.sudoers.local
+                            mail.sudoers.lan
                         </div>
                     </div>
 
@@ -688,7 +688,7 @@
                             <li>Bridge network <code>tso-net</code></li>
                             <li>Resolución DNS entre contenedores</li>
                             <li>Puertos mapeados al host sin conflictos</li>
-                            <li>Dominio <code>sudoers.local</code></li>
+                            <li>Dominio <code>sudoers.lan</code></li>
                         </ul>
                     </div>
                     <div class="arch-card">
@@ -727,7 +727,7 @@
             <div class="container">
                 <div class="footer-inner">
                     <span>Sistemas Operativos II — Servidor Debian</span>
-                    <code>sudoers.local</code>
+                    <code>sudoers.lan</code>
                 </div>
             </div>
         </footer>

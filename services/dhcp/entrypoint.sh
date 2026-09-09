@@ -10,7 +10,7 @@ set -e
 SUB="${DHCP_SUBNET:-192.168.1.0/24}"
 POOL="${DHCP_POOL:-192.168.1.100 - 192.168.1.200}"
 DNS_SRV="${DHCP_DNS:-${HOST_IP:-192.168.1.10}}"
-DOMAIN="${DNS_DOMAIN:-sudoers.local}"
+DOMAIN="${DNS_DOMAIN:-sudoers.lan}"
 ROUTER="${HOST_IP:-192.168.1.10}"
 
 CONF="/etc/kea/kea-dhcp4.conf"
