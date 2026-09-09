@@ -181,6 +181,13 @@ fi
 echo ">>> Configuración OK"
 
 # ========================================
+# Preparar directorios para named (corre como 'bind')
+# ========================================
+mkdir -p /run/named
+chown bind:bind /run/named
+chown -R bind:bind /var/cache/bind
+
+# ========================================
 # Resumen
 # ========================================
 echo "============================================"
@@ -190,4 +197,5 @@ echo "  Dominio: ${DOMAIN}"
 [ -n "$IP_ENO1" ] && echo "  ENO1:    ${IP_ENO1}"
 echo "============================================"
 
+cd /var/cache/bind
 exec /usr/sbin/named -g -u bind -c /etc/bind/named.conf
