@@ -53,8 +53,8 @@ www             IN      A       ${IP}
 files           IN      A       ${IP}
 mail            IN      A       ${IP}
 print           IN      A       ${IP}
+@               IN      A       ${IP}
 @               IN      MX      10 mail.${DOMAIN}.
-${DOMAIN%%.*}    IN      CNAME   www.${DOMAIN}.
 EOF
 
     cat > "${ZONES_DIR}/db.${i3}.${i2}.${i1}" << EOF
