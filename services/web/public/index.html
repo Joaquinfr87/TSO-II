@@ -669,58 +669,6 @@
             </div>
         </section>
 
-        <hr class="divider">
-
-        <!-- Architecture -->
-        <section class="section" id="arquitectura">
-            <div class="container">
-                <span class="section-label reveal">Stack técnico</span>
-                <h2 class="section-title reveal">Arquitectura del servidor</h2>
-                <p class="section-desc reveal">
-                    Todos los contenedores comparten la red interna
-                    <code>tso-net</code> y se comunican por nombre de servicio.
-                </p>
-
-                <div class="arch-grid reveal">
-                    <div class="arch-card">
-                        <h3>🔗 Red interna</h3>
-                        <ul>
-                            <li>Bridge network <code>tso-net</code></li>
-                            <li>Resolución DNS entre contenedores</li>
-                            <li>Puertos mapeados al host sin conflictos</li>
-                            <li>Dominio <code>sudoers.lan</code></li>
-                        </ul>
-                    </div>
-                    <div class="arch-card">
-                        <h3>💾 Persistencia</h3>
-                        <ul>
-                            <li>Volúmenes con nombre: <code>dns_zones</code>, <code>mail_data</code></li>
-                            <li>Datos sobreviven a recreaciones de contenedor</li>
-                            <li>Configuraciones versionadas en el repositorio</li>
-                            <li>Secretos locales en <code>.env</code> (gitignored)</li>
-                        </ul>
-                    </div>
-                    <div class="arch-card">
-                        <h3>🚀 Despliegue</h3>
-                        <ul>
-                            <li><code>docker compose up -d --build</code></li>
-                            <li>Imágenes con versión fija (no <code>latest</code>)</li>
-                            <li>Un solo <code>docker-compose.yml</code> como fuente de verdad</li>
-                            <li>Reproducible en cualquier máquina con Docker</li>
-                        </ul>
-                    </div>
-                    <div class="arch-card">
-                        <h3>👥 Equipo</h3>
-                        <ul>
-                            <li>DNS + Correo — Joaquín</li>
-                            <li>Web + Archivos — David</li>
-                            <li>DHCP + Base de datos — Nicolás</li>
-                            <li>Cada integrante edita solo su servicio</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- Footer -->
         <footer>
