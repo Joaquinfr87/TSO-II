@@ -54,3 +54,6 @@ smtp_tls_security_level = may
 
 # Habilitar AUTH en el banner SMTP
 smtpd_sasl_tls_only = no
+
+# Logging a archivo (Docker captura stdout/stderr)
+maillog_file = /var/log/mail.log
