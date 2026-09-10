@@ -100,8 +100,10 @@ services:
     ports:
       - "${SMB_PORT_445:-445}:445"
       - "139:139"
+      - "${FILES_WEB_PORT:-8082}:80"
     volumes:
       - ${FILES_SHARE_DIR:-./services/files/data}:/srv/share
+      - files_db:/database
     networks:
       - tso-net
 
@@ -148,6 +150,7 @@ volumes:
   mail_data:
   print_output:
   db_data:
+  files_db:
 
 # Red interna del proyecto.
 networks:
