@@ -5,7 +5,7 @@ mkdir -p /srv/share /database /var/lib/nfs/v4recovery /run/samba
 chmod -R 777 /srv/share
 
 USERS="nicolas joaquin david"
-PASS="sudoers123"
+PASS="sudoers123456"
 
 # Crear usuarios Linux y registrar contraseñas Samba
 for u in $USERS; do
@@ -25,8 +25,7 @@ if [ ! -f "$DB_FILE" ]; then
         --root /srv/share \
         --address 0.0.0.0 \
         --port 80 \
-        --auth.method json \
-        --password.min 6
+        --auth.method json
     
     for u in $USERS; do
         filebrowser users add "$u" "$PASS" --perm.admin=true --database "$DB_FILE"
