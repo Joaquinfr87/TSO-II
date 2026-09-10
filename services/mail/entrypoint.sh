@@ -7,7 +7,6 @@ set -e
 # ========================================
 
 DOMAIN="${MAIL_DOMAIN:-mail.sudoers.lan}"
-MAIL_NAME="${DOMAIN%%.*}"       # "mail"
 BASE_DOMAIN="${DOMAIN#*.}"      # "sudoers.lan"
 
 echo "============================================"
@@ -49,9 +48,6 @@ postconf -e "myorigin=${BASE_DOMAIN}"
 # ========================================
 echo ">>> Configurando Dovecot..."
 # Los archivos de configuración ya están copiados por el Dockerfile.
-# Solo ajustamos mail_home_dir con el dominio base.
-sed -i "s|mail_home_dir = /home/%u|mail_home_dir = /home/%u|" \
-    /etc/dovecot/conf.d/10-mail.conf 2>/dev/null || true
 
 # ========================================
 # 4. Crear usuarios de correo
@@ -97,14 +93,15 @@ mkdir -p /var/run/dovecot
 chown dovecot:dovecot /var/run/dovecot
 chmod 755 /var/run/dovecot
 
+# Crear directorio de logs
+mkdir -p /var/log
+touch /var/log/mail.log /var/log/dovecot.log
+
 # ========================================
 # 7. Iniciar servicios
 # ========================================
-echo ">>> Iniciando rsyslog..."
-service rsyslog start
-
 echo ">>> Iniciando Postfix..."
-service postfix start
+postfix start
 
 echo ">>> Verificando configuración Postfix..."
 postconf -n | head -20
