@@ -89,8 +89,8 @@ newaliases 2>/dev/null || true
 # ========================================
 # 6. Crear directorio para el socket de autenticación de Dovecot
 # ========================================
+rm -rf /var/run/dovecot
 mkdir -p /var/run/dovecot
-rm -f /var/run/dovecot/auth-master
 chown dovecot:dovecot /var/run/dovecot
 chmod 755 /var/run/dovecot
 
@@ -120,4 +120,5 @@ echo "  Usuarios: joaquin, nicolas, david"
 echo "============================================"
 
 # Dovecot en foreground (PID 1)
+rm -rf /var/run/dovecot/*
 exec dovecot -F
