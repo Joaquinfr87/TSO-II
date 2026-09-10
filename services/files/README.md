@@ -39,9 +39,9 @@ smbclient //<IP_DEL_HOST>/compartido -U <usuario>
 
 ## Estado
 
-- [ ] Definir los usuarios Samba y sus contraseñas
-- [ ] Ajustar permisos y recursos compartidos según lo pedido
-- [ ] Configurar el recurso como público o autenticado según consigna
+- [x] Definir los usuarios Samba (`nicolas`, `joaquin`, `david`) y sus contraseñas en el Dockerfile
+- [x] Ajustar permisos y recurso compartido autenticado (`valid users`) en `smb.conf`
+- [x] Configurar el recurso como autenticado según consigna
 
 ## Referencias
 
