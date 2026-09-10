@@ -20,15 +20,16 @@ DB_FILE="/database/filebrowser.db"
 
 if [ ! -f "$DB_FILE" ]; then
     echo ">>> Inicializando Filebrowser DB..."
-    filebrowser config init --db "$DB_FILE" --root /srv/share --address 0.0.0.0 --port 80 --signup=false
+    filebrowser config init --database "$DB_FILE"
+    filebrowser config set --database "$DB_FILE" --root /srv/share --address 0.0.0.0 --port 80 --noauth
     
     for u in $USERS; do
-        filebrowser users add "$u" "$PASS" --perm.admin=true --db "$DB_FILE"
+        filebrowser users add "$u" "$PASS" --perm.admin=true --database "$DB_FILE"
     done
 else
     for u in $USERS; do
-        filebrowser users update "$u" --password "$PASS" --perm.admin=true --db "$DB_FILE" 2>/dev/null || \
-        filebrowser users add "$u" "$PASS" --perm.admin=true --db "$DB_FILE" 2>/dev/null || true
+        filebrowser users update "$u" --password "$PASS" --perm.admin=true --database "$DB_FILE" 2>/dev/null || \
+        filebrowser users add "$u" "$PASS" --perm.admin=true --database "$DB_FILE" 2>/dev/null || true
     done
 fi
 
@@ -42,7 +43,7 @@ rpc.mountd 2>/dev/null || true
 
 # Arrancar Filebrowser en segundo plano
 echo ">>> Iniciando Filebrowser (Web) en el puerto 80..."
-filebrowser --db "$DB_FILE" --root /srv/share --address 0.0.0.0 --port 80 &
+filebrowser --database "$DB_FILE" --root /srv/share --address 0.0.0.0 --port 80 &
 
 # Arrancar Samba en primer plano
 echo ">>> Iniciando Samba (SMB) para Thunar / Windows..."
