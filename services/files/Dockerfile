@@ -1,23 +1,21 @@
-# Servidor de archivos con Samba
+# Servidor de archivos con Samba (SMB) y Filebrowser (Web)
 FROM debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends samba && \
+    apt-get install -y --no-install-recommends samba curl ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Crear usuarios de Linux y darles alta en Samba con la contraseña 'sudoers123'
-RUN useradd -M -s /usr/sbin/nologin nicolas && \
-    useradd -M -s /usr/sbin/nologin joaquin && \
-    useradd -M -s /usr/sbin/nologin david && \
-    (echo "sudoers123"; echo "sudoers123") | smbpasswd -a -s nicolas && \
-    (echo "sudoers123"; echo "sudoers123") | smbpasswd -a -s joaquin && \
-    (echo "sudoers123"; echo "sudoers123") | smbpasswd -a -s david
+# Instalar Filebrowser
+RUN curl -fsSL https://github.com/filebrowser/filebrowser/releases/latest/download/linux-amd64-filebrowser.tar.gz | tar -xzv -C /usr/local/bin filebrowser
 
 COPY smb.conf /etc/samba/smb.conf
-RUN mkdir -p /srv/share && chmod -R 777 /srv/share
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-EXPOSE 445 139
+RUN mkdir -p /srv/share /database && chmod -R 777 /srv/share
 
-CMD ["/usr/sbin/smbd", "--foreground", "--no-process-group"]
+EXPOSE 445 139 80
+
+ENTRYPOINT ["/entrypoint.sh"]
