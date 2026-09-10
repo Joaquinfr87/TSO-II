@@ -112,9 +112,12 @@ services:
     build: ./services/mail
     container_name: tso-mail
     ports:
-      - "25:25"        # SMTP
+      - "25:25"        # SMTP (transferencia entre servidores)
+      - "587:587"      # SMTP Submission (clientes con auth)
       - "110:110"      # POP3 (Dovecot)
       - "143:143"      # IMAP (Dovecot)
+      - "993:993"      # IMAPS (IMAP cifrado)
+      - "995:995"      # POP3S (POP3 cifrado)
     environment:
       MAIL_DOMAIN: ${MAIL_DOMAIN:-mail.sudoers.lan}
     volumes:
