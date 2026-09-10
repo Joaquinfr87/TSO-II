@@ -97,10 +97,15 @@ services:
   files:
     build: ./services/files
     container_name: tso-files
+    privileged: true
     ports:
       - "${SMB_PORT_445:-445}:445"
       - "139:139"
       - "${FILES_WEB_PORT:-8082}:80"
+      - "2049:2049"
+      - "2049:2049/udp"
+      - "111:111"
+      - "111:111/udp"
     volumes:
       - ${FILES_SHARE_DIR:-./services/files/data}:/srv/share
       - files_db:/database
