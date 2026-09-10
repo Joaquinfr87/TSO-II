@@ -25,8 +25,9 @@ if [ ! -f "$DB_FILE" ]; then
         --root /srv/share \
         --address 0.0.0.0 \
         --port 80 \
-        --auth.method json
-    
+        --auth.method json \
+        --minimumPasswordLength 1
+
     for u in $USERS; do
         filebrowser users add "$u" "$PASS" --perm.admin=true --database "$DB_FILE"
     done
@@ -39,7 +40,6 @@ fi
 
 # Inicializar y arrancar servidor NFS (Kernel)
 echo ">>> Iniciando servicios NFS..."
-cp -f /etc/exports.bak /etc/exports 2>/dev/null || true
 rpcbind 2>/dev/null || true
 exportfs -arv 2>/dev/null || true
 rpc.nfsd 8 2>/dev/null || true
