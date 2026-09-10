@@ -168,70 +168,93 @@ El script `entrypoint.sh` actúa como orquestador del contenedor:
 
 ---
 
-## 5. Guía de Pruebas y Verificación
+## 5. Guía de Conexión, Inicio de Sesión y Pruebas
 
-### 5.1 Credenciales por Defecto
+### 5.1 Credenciales Unificadas
 
 - **Usuarios:** `nicolas`, `joaquin`, `david`
 - **Contraseña por defecto:** `sudoers123456`
+- **Dominio Samba / Workgroup:** `WORKGROUP`
 
 ---
 
-### 5.2 Verificación Vía Samba (SMB)
+### 5.2 Conexión e Inicio de Sesión Vía Samba (SMB / CIFS)
 
-#### Desde explorador gráfico (Thunar / Nautilus / Dolphin):
-1. Presionar `Ctrl + L` para ingresar la barra de ubicación.
-2. Ingresar: `smb://files.sudoers.lan/compartido` (o `smb://<IP_DEL_SERVIDOR>/compartido`).
-3. Ingresar usuario (`david`), dominio (`WORKGROUP`) y contraseña (`sudoers123456`).
+Samba está pensado para la conexión de usuarios finales con exploradores de archivos gráficos.
 
-#### Desde terminal con `smbclient`:
+#### A. Desde Explorador Gráfico (Thunar / Nautilus / Dolphin / Explorador de Windows):
+1. Abrir el gestor de archivos y presionar `Ctrl + L` para habilitar la barra de direcciones.
+2. Escribir la URL del recurso:
+   - `smb://files.sudoers.lan/compartido` (o `smb://<IP_DEL_SERVIDOR>/compartido`)
+3. En la ventana emergente de autenticación, ingresar:
+   - **Usuario:** `david` (o `nicolas` / `joaquin`)
+   - **Dominio:** `WORKGROUP`
+   - **Contraseña:** `sudoers123456`
+
+#### B. Desde Terminal con `smbclient`:
 ```bash
 smbclient //192.168.0.105/compartido -U david
-# Contraseña: sudoers123456
+# Solicitará contraseña: sudoers123456
 ```
 
 ---
 
-### 5.3 Verificación Vía Web (Filebrowser)
+### 5.3 Conexión e Inicio de Sesión Vía Web (Filebrowser)
 
-1. Abrir el navegador e ingresar a `http://files.sudoers.lan` o `http://<IP_DEL_SERVIDOR>:8082`.
-2. Iniciar sesión con cualquiera de los usuarios preconfigurados (`david` / `sudoers123456`).
-3. Probar la subida, navegación y descarga de archivos desde la interfaz web.
+Filebrowser proporciona acceso gráfico mediante cualquier navegador web sin necesidad de clientes instalados.
+
+1. Abrir el navegador e ingresar a la URL:
+   - `http://files.sudoers.lan` (a través del proxy Nginx)
+   - `http://<IP_DEL_SERVIDOR>:8082` (acceso directo al puerto mapeado)
+2. En la pantalla de inicio de sesión, ingresar las credenciales:
+   - **Usuario:** `david`
+   - **Contraseña:** `sudoers123456`
+3. Permite navegación gráfica, descarga, reproducción y subida de archivos mediante arrastrar y soltar (*drag & drop*).
 
 ---
 
-### 5.4 Verificación Vía NFS (Kernel)
+### 5.4 Conexión y Montaje Vía NFS (Network File System)
 
-#### 1. Comprobar recursos exportados desde el cliente:
+NFS no utiliza un formulario de login con usuario/contraseña. La autenticación se realiza a nivel de host/IP y permisos de kernel.
+
+#### A. Requisitos en la PC Cliente (Linux / Arch Linux / Ubuntu):
+- **Arch Linux:** `sudo pacman -S nfs-utils`
+- **Debian / Ubuntu / Mint:** `sudo apt install nfs-common`
+
+#### B. Verificación de Exportaciones y Firewall:
+1. Comprobar que los puertos de firewall (**111** y **2049** TCP/UDP) estén abiertos en el servidor Debian.
+2. Listar exportaciones desde el cliente:
+   ```bash
+   showmount -e 192.168.0.105
+   ```
+
+#### C. Montaje Manual (Concepto de Root `fsid=0` en NFSv4):
+Dado que el servidor NFS exporta `/srv/share` con `fsid=0`, esa carpeta actúa como la **raíz (`/`) del espacio NFSv4**.
+- Por ende, en NFSv4 la ruta remota a solicitar es **`/`** y NO `/srv/share`.
+
 ```bash
-showmount -e 192.168.0.105
+# 1. Crear el punto de montaje local
+sudo mkdir -p /mnt/servidor_archivos
+
+# 2. Montar el sistema NFSv4 apuntando a la raíz (/)
+sudo mount -t nfs 192.168.0.105:/ /mnt/servidor_archivos
+
+# O especificando NFSv4 explícitamente:
+sudo mount -t nfs4 192.168.0.105:/ /mnt/servidor_archivos
 ```
-*Resultado esperado:*
+
+#### D. Montaje Automático en Inicio del Sistema (`/etc/fstab`):
+Para montar la carpeta de forma permanente cada vez que enciende la PC cliente (ej. Arch Linux), agregar al archivo `/etc/fstab`:
+
 ```text
-Export list for 192.168.0.105:
-/srv/share *
+192.168.0.105:/  /mnt/servidor_archivos  nfs  defaults,_netdev,x-systemd.automount  0  0
 ```
 
-#### 2. Montar en la máquina cliente:
+> `x-systemd.automount` garantiza que el montaje se realice únicamente cuando haya red disponible, evitando retardos en el arranque de la PC.
+
+#### E. Desmontar la Carpeta:
 ```bash
-sudo mkdir -p /mnt/nfs_test
-sudo mount -t nfs 192.168.0.105:/srv/share /mnt/nfs_test
-```
-
-#### 3. Probar sincronización entre protocolos:
-```bash
-# Crear un archivo por NFS
-sudo touch /mnt/nfs_test/prueba_nfs.txt
-
-# Verificar que es visible en el sistema
-ls -la /mnt/nfs_test
-```
-
-Al revisar en **Filebrowser** o **Samba**, el archivo `prueba_nfs.txt` estará disponible de manera inmediata.
-
-#### 4. Desmontar al finalizar:
-```bash
-sudo umount /mnt/nfs_test
+sudo umount /mnt/servidor_archivos
 ```
 
 ---
