@@ -25,7 +25,8 @@ if [ ! -f "$DB_FILE" ]; then
         --root /srv/share \
         --address 0.0.0.0 \
         --port 80 \
-        --auth.method json
+        --auth.method json \
+        --password.min 6
     
     for u in $USERS; do
         filebrowser users add "$u" "$PASS" --perm.admin=true --database "$DB_FILE"
