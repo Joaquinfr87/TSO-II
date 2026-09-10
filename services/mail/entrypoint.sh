@@ -43,6 +43,26 @@ postconf -e "myhostname=${DOMAIN}"
 postconf -e "mydomain=${BASE_DOMAIN}"
 postconf -e "myorigin=${BASE_DOMAIN}"
 
+# Habilitar puerto 587 (submission) con SASL
+# Si no existe la línea submission activa, la agregamos al final
+if ! grep -q '^submission' /etc/postfix/master.cf; then
+    cat >> /etc/postfix/master.cf << 'SUBMISSION'
+
+submission inet n       -       n       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_sasl_type=dovecot
+  -o smtpd_sasl_path=private/auth
+  -o smtpd_reject_unlisted_recipient=no
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o milter_macro_daemon_name=ORIGINATING
+SUBMISSION
+    echo ">>> Puerto 587 (submission) habilitado"
+else
+    echo ">>> Puerto 587 ya habilitado"
+fi
+
 # ========================================
 # 3. Configurar Dovecot
 # ========================================
