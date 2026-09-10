@@ -21,7 +21,12 @@ DB_FILE="/database/filebrowser.db"
 if [ ! -f "$DB_FILE" ]; then
     echo ">>> Inicializando Filebrowser DB..."
     filebrowser config init --database "$DB_FILE"
-    filebrowser config set --database "$DB_FILE" --root /srv/share --address 0.0.0.0 --port 80 --noauth
+    filebrowser config set --database "$DB_FILE" \
+        --root /srv/share \
+        --address 0.0.0.0 \
+        --port 80 \
+        --auth.method json \
+        --signup false
     
     for u in $USERS; do
         filebrowser users add "$u" "$PASS" --perm.admin=true --database "$DB_FILE"
