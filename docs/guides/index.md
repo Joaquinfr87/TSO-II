@@ -32,6 +32,7 @@ Cada guía debe incluir:
 - [Agregar usuarios y asignar privilegios](./agregar-usuarios.md)
 - [Evitar la suspensión al cerrar la tapa (laptop como servidor)](./laptop-siempre-encendida.md)
 - [Instalar paquetes en un servidor sin internet: proxy APT y NAT](./proxy-apt-y-nat.md)
+- [Servidor de archivos multi-protocolo: Samba, NFS y Filebrowser](./servidor-archivos.md)
 
 ## Cómo continuar
 
