@@ -15,6 +15,7 @@ RUN apt-get update && \
 RUN mkdir -p /etc/dovecot/conf.d
 
 COPY main.cf /etc/postfix/main.cf
+COPY master.cf /etc/postfix/master.cf
 COPY 10-mail.conf /etc/dovecot/conf.d/10-mail.conf
 COPY 10-auth.conf /etc/dovecot/conf.d/10-auth.conf
 COPY 10-master.conf /etc/dovecot/conf.d/10-master.conf
