@@ -1,0 +1,3 @@
+# Configuracion de exportaciones NFS - Servidor TSO-II
+# Compartir /srv/share con todos los clientes de la red local
+/srv/share *(rw,sync,no_subtree_check,no_root_squash,fsid=0)
