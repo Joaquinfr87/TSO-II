@@ -90,6 +90,7 @@ newaliases 2>/dev/null || true
 # 6. Crear directorio para el socket de autenticación de Dovecot
 # ========================================
 mkdir -p /var/run/dovecot
+rm -f /var/run/dovecot/auth-master
 chown dovecot:dovecot /var/run/dovecot
 chmod 755 /var/run/dovecot
 
