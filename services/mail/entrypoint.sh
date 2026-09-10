@@ -87,16 +87,15 @@ EOF
 newaliases 2>/dev/null || true
 
 # ========================================
-# 6. Crear directorio para el socket de autenticación de Dovecot
+# 6. Preparar directorios de sockets
 # ========================================
 rm -rf /var/run/dovecot
 mkdir -p /var/run/dovecot
 chown dovecot:dovecot /var/run/dovecot
-chmod 755 /var/run/dovecot
 
-# Crear directorio de logs
-mkdir -p /var/log
-touch /var/log/mail.log /var/log/dovecot.log
+# Asegurar que el directorio del socket de Postfix exista
+mkdir -p /var/spool/postfix/private
+chown postfix:postfix /var/spool/postfix/private
 
 # ========================================
 # 7. Iniciar servicios
