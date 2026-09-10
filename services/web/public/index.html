@@ -542,12 +542,22 @@
                 grid-template-columns: 1fr;
             }
 
-        .hero-logo {
-            width: 250px;
-            height: auto;
+        .hero-logo-wrap {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
             margin-bottom: 1.5rem;
-            filter: drop-shadow(0 0 30px rgba(88, 166, 255, 0.3));
+            border: 2px solid var(--border-subtle);
+            box-shadow: 0 0 30px rgba(88, 166, 255, 0.3);
             animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .hero-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .hero-meta {
@@ -599,7 +609,9 @@
                 <span class="dot"></span>
                 Todos los servicios operativos
             </div>
-            <img src="/assets/img/logo-sudoers.png" alt="Sudoers Logo" class="hero-logo">
+            <div class="hero-logo-wrap">
+                <img src="/assets/img/logo-sudoers.png" alt="Sudoers Logo" class="hero-logo">
+            </div>
             <h1>
                 Servidor<br><span class="highlight">Debian</span>
             </h1>
