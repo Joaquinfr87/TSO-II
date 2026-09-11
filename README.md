@@ -64,8 +64,8 @@ El proyecto incluye Portainer como panel web para administrar los contenedores s
 
 Acceso:
 
-- **Con dominio local:** `https://portainer.sudoers.lan:9443` (requiere que el cliente use el DNS interno del proyecto, o una entrada en `/etc/hosts`).
-- **Por IP:** `https://<IP-del-servidor>:9443`
+- **Con dominio local (proxy web):** `http://portainer.sudoers.lan` — Nginx lo redirige al panel sin puerto.
+- **Por IP directa:** `https://<IP-del-servidor>:9443`
 
 Primer uso:
 
