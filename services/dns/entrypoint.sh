@@ -53,6 +53,7 @@ www             IN      A       ${IP}
 files           IN      A       ${IP}
 mail            IN      A       ${IP}
 print           IN      A       ${IP}
+portainer       IN      A       ${IP}
 @               IN      A       ${IP}
 @               IN      MX      10 mail.${DOMAIN}.
 EOF
@@ -71,6 +72,7 @@ ${i4}              IN      PTR     web.${DOMAIN}.
 ${i4}              IN      PTR     mail.${DOMAIN}.
 ${i4}              IN      PTR     files.${DOMAIN}.
 ${i4}              IN      PTR     print.${DOMAIN}.
+${i4}              IN      PTR     portainer.${DOMAIN}.
 EOF
 
     echo ">>> Zonas ${LABEL} generadas (${IP})"
