@@ -148,6 +148,24 @@ services:
     networks:
       - tso-net
 
+  # ------------------------------------------------------------------
+  # Portainer (Panel web de gestión de Docker) — Joaquín
+  # ------------------------------------------------------------------
+  # Interfaz web para administrar contenedores, imágenes, volúmenes y redes.
+  # Acceso: https://<IP-del-servidor>:9443  (HTTPS, certificado autofirmado)
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: tso-portainer
+    restart: unless-stopped
+    ports:
+      - "8000:8000"                      # Agente Edge / túnel remoto
+      - "${PORTAINER_PORT:-9443}:9443"   # UI web (HTTPS)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+    networks:
+      - tso-net
+
 # Volúmenes con nombre: los datos persisten aunque los contenedores se borren.
 volumes:
   dns_zones:
@@ -156,6 +174,7 @@ volumes:
   print_output:
   db_data:
   files_db:
+  portainer_data:
 
 # Red interna del proyecto.
 networks:
