@@ -12,6 +12,9 @@ Configurar el firewall `nftables` y endurecer el acceso SSH del servidor, respet
 - Acceso SSH al servidor desde la red administrativa (wlo1).
 - Usuario con privilegios `sudo` en el servidor.
 - Los 3 admins ya creados como usuarios del sistema.
+- El repo clonado en el servidor.
+
+> Los archivos de configuración viven en `server/` (raíz del repo), **no** en esta carpeta. Acá está la guía; la configuración real se versiona y se aplica con `git pull` + `deploy.sh`.
 
 ## Pasos
 
@@ -27,20 +30,21 @@ ssh-copy-id nicolas@192.168.0.105
 
 Probar en OTRA terminal que el login con clave funciona antes de continuar.
 
-### 2. Copiar el sshd_config endurecido
+### 2. Aplicar firewall y SSH desde el repo
 
-Desde una máquina con el repo clonado (o vía scp):
-
-```bash
-scp docs/guides/sshd_config joaquin@192.168.0.105:/tmp/sshd_config
-```
-
-En el servidor:
+Los configs están en `server/nftables.conf` y `server/sshd_config`. Para aplicarlos en el servidor, dentro del repo clonado:
 
 ```bash
-sudo cp /tmp/sshd_config /etc/ssh/sshd_config
-sudo systemctl restart ssh
+git pull
+sudo bash server/deploy.sh
 ```
+
+El script hace 4 cosas en orden seguro:
+
+1. **Valida** la sintaxis de `nftables.conf` con `nft -c` (si falla, no aplica nada).
+2. Aplica el firewall.
+3. Hace **respaldo automático** de `/etc/ssh/sshd_config` (con fecha).
+4. Valida la config de ssh con `sshd -t` y **solo entonces** reinicia el servicio.
 
 Verificación en una nueva sesión:
 
@@ -48,30 +52,7 @@ Verificación en una nueva sesión:
 ssh joaquin@192.168.0.105   # debe entrar sin pedir contraseña
 ```
 
-### 3. Copiar el firewall nftables
-
-```bash
-scp docs/guides/nftables.conf joaquin@192.168.0.105:/tmp/nftables.conf
-```
-
-En el servidor:
-
-```bash
-sudo cp /tmp/nftables.conf /etc/nftables.conf
-sudo nft -f /etc/nftables.conf
-sudo systemctl enable nftables --now
-```
-
-> ⚠️ Hacerlo en una sesión con la clave SSH ya probada: si una regla cierra el acceso, podés reentrar solo si la clave funciona (las reglas de nftables no sobreviven a un `systemctl stop nftables` por defecto en Trixie solo si está habilitado como servicio... ver nota abajo).
-
-> Nota: en Debian Trixie, `nftables` corre como servicio. Si la regla te deja afuera, agregar regla con `sudo nft add rule` en otra consola o usar la consola física/Docker (tty) del servidor.
-
-Verificación:
-
-```bash
-sudo nft list ruleset
-sudo nft -c -f /etc/nftables.conf   # valida sintaxis sin aplicar
-```
+> ⚠️ La primera vez, hacerlo en una sesión con la clave SSH ya probada: si una regla cierra el acceso, podés reentrar solo si la clave funciona.
 
 ### 4. Instalar y configurar fail2ban
 

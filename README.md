@@ -37,6 +37,11 @@ Esta repo reúne documentación sobre la instalación y configuración de un ser
 │   ├── mail/                 ← Postfix + Dovecot (Joaquín)
 │   ├── iis/                  ← documentación: IIS no corre en Docker Linux
 │   └── domain/               ← documentación: controlador de dominio (AD)
+├── server/                   ← config del host (fuera de Docker)
+│   ├── nftables.conf         ← firewall del servidor
+│   ├── sshd_config           ← acceso SSH endurecido
+│   ├── deploy.sh             ← aplica los configs en el servidor
+│   └── README.md             ← estructura y flujo
 └── teams                     ← documentación del equipo
     ├── index.md
     └── reparticion-tareas.md
@@ -45,6 +50,7 @@ Esta repo reúne documentación sobre la instalación y configuración de un ser
 - `docs/theory/`: documentación conceptual y referencias teóricas.
 - `docs/guides/`: guías prácticas de instalación y configuración.
 - `services/`: el código real de los servicios (Dockerfiles, configuraciones, contenido).
+- `server/`: configuración del sistema operativo del host (firewall, SSH) y script de deploy.
 - `teams/`: documentación del equipo, repartición de tareas y decisiones.
 
 ## ¡Levantar los servicios!
