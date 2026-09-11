@@ -32,6 +32,14 @@ Cada tema puede tener su propio archivo cuando la descripción exceda un breve r
 - [Correo Electrónico: SMTP, IMAP, POP3](./correo.md)
 - [Servidores web, Nginx y proxy inverso](./web-y-proxy.md)
 - [Dominios y resolución de nombres](./dominios.md)
+- [Servidores de archivos: Samba, NFS y Web](./archivos.md)
+- [Bases de datos relacionales: PostgreSQL](./base-de-datos.md)
+- [Impresión en red: CUPS](./impresion.md)
+
+## Gestión y seguridad
+
+- [Gestión de contenedores: Portainer](./portainer.md)
+- [Seguridad y hardening en servidores](./seguridad.md)
 
 ## Notas iniciales
 

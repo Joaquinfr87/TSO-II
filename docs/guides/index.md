@@ -23,6 +23,8 @@ Cada guía debe incluir:
 
 ## Índice de guías
 
+### Instalación y base
+
 - [Instalación de Debian en el servidor](./instalacion-debian.md)
 - [Configuración inicial del servidor Debian](./configuracion-debian.md)
 - [Instalación de Docker en Debian](./instalacion-docker.md)
@@ -32,7 +34,20 @@ Cada guía debe incluir:
 - [Agregar usuarios y asignar privilegios](./agregar-usuarios.md)
 - [Evitar la suspensión al cerrar la tapa (laptop como servidor)](./laptop-siempre-encendida.md)
 - [Instalar paquetes en un servidor sin internet: proxy APT y NAT](./proxy-apt-y-nat.md)
+
+### Servicios
+
 - [Servidor de archivos multi-protocolo: Samba, NFS y Filebrowser](./servidor-archivos.md)
+- [Servidor de base de datos: PostgreSQL](./servidor-base-de-datos.md)
+- [Servidor de impresión: CUPS](./servidor-impresion.md)
+- [Panel de gestión: Portainer](./portainer.md)
+- [Servidor de correo (Postfix + Dovecot)](../../services/mail/README.md)
+- [Servidor DNS (Bind9)](../../services/dns/README.md)
+- [Servidor web (Nginx)](../../services/web/README.md)
+- [Servidor DHCP (Kea)](../../services/dhcp/README.md)
+
+### Seguridad
+
 - [Hardening de seguridad: nftables + SSH + fail2ban](./hardening-seguridad.md)
 
 ## Cómo continuar
