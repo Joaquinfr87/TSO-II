@@ -399,6 +399,59 @@
         /* ═══════════════════════════════════════════════════
            Architecture Section
            ═══════════════════════════════════════════════════ */
+        /* ═══════════════════════════════════════════════════
+           Team Section
+           ═══════════════════════════════════════════════════ */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .member-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 0.875rem;
+            padding: 1.75rem;
+            text-align: center;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .member-card:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-surface-hover);
+        }
+
+        .member-avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: var(--bg-surface-hover);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin: 0 auto 1rem;
+        }
+
+        .member-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .member-role {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            font-weight: 300;
+            margin-top: 0.35rem;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           Architecture Section
+           ═══════════════════════════════════════════════════ */
         .arch-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -555,6 +608,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
             .hero-logo-wrap {
                 width: 70px;
                 height: 70px;
@@ -597,6 +654,7 @@
         <div class="nav-links">
             <a href="#servicios">Servicios</a>
             <a href="#arquitectura">Arquitectura</a>
+            <a href="#equipo">Equipo</a>
             <a href="http://print.sudoers.lan">Impresión</a>
         </div>
         <a href="http://print.sudoers.lan" class="nav-pill">
@@ -648,6 +706,16 @@
                         <a href="http://web.sudoers.lan" class="card-endpoint active">
                             <span class="ep-dot"></span>
                             web.sudoers.lan ↗
+                        </a>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="card-icon">🎛️</div>
+                        <h3>Gestión</h3>
+                        <p>Portainer como panel web para administrar contenedores, imágenes, volúmenes y redes de Docker.</p>
+                        <a href="https://portainer.sudoers.lan:9443" target="_blank" class="card-endpoint active">
+                            <span class="ep-dot"></span>
+                            portainer.sudoers.lan:9443 ↗
                         </a>
                     </div>
 
@@ -713,11 +781,42 @@
         </section>
 
 
+        <!-- Team -->
+        <section class="section" id="equipo">
+            <div class="container">
+                <span class="section-label reveal">Equipo de trabajo</span>
+                <h2 class="section-title reveal">Grupo 1 — Sudoers</h2>
+                <p class="section-desc reveal">
+                    Estudiantes de Sistemas Operativos II a cargo del diseño,
+                    despliegue y mantenimiento de la infraestructura del servidor.
+                </p>
+
+                <div class="team-grid reveal">
+                    <div class="member-card">
+                        <div class="member-avatar">🧑‍💻</div>
+                        <h3>Joaquin Alessandro Felipez Rojas</h3>
+                        <p class="member-role">DNS · Mail · Portainer</p>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-avatar">🧑‍💻</div>
+                        <h3>Nicolas Sebastian Reguerin Meneses</h3>
+                        <p class="member-role">DHCP · Base de datos</p>
+                    </div>
+                    <div class="member-card">
+                        <div class="member-avatar">🧑‍💻</div>
+                        <h3>David Willy Cruz Huanca</h3>
+                        <p class="member-role">Web · Archivos</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
         <!-- Footer -->
         <footer>
             <div class="container">
                 <div class="footer-inner">
-                    <span>Sistemas Operativos II — Servidor Debian</span>
+                    <span>Sistemas Operativos II — Grupo 1 · Sudoers</span>
                     <code>sudoers.lan</code>
                 </div>
             </div>
