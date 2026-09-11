@@ -58,6 +58,23 @@ docker compose up -d --build
 
 Ver el detalle del flujo de trabajo en [Uso colaborativo de Docker en el equipo](./docs/guides/docker-compose-flujo.md).
 
+## Panel de gestión: Portainer
+
+El proyecto incluye Portainer como panel web para administrar los contenedores sin usar la terminal. Está definido en el `docker-compose.yml` con la imagen oficial `portainer/portainer-ce` y datos persistentes en el volumen `portainer_data`.
+
+Acceso:
+
+- **Con dominio local:** `https://portainer.sudoers.lan:9443` (requiere que el cliente use el DNS interno del proyecto, o una entrada en `/etc/hosts`).
+- **Por IP:** `https://<IP-del-servidor>:9443`
+
+Primer uso:
+
+1. Levantar el servicio: `docker compose up -d portainer`
+2. Abrir la URL y crear el usuario administrador.
+3. Elegir el entorno **Starter → Local** (usa `/var/run/docker.sock`, ya ve todos los contenedores `tso-*`).
+
+> Nota: el certificado es autofirmado; el navegador pedirá aceptar la excepción de seguridad.
+
 ## Convención de documentos
 
 - Usar un `index.md` por carpeta para describir el propósito de la sección y enlazar los documentos.
