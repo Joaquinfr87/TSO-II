@@ -133,6 +133,11 @@
             opacity: 0.88;
         }
 
+        .nav-pill .pill-icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
         /* ═══════════════════════════════════════════════════
            Layout
            ═══════════════════════════════════════════════════ */
@@ -248,8 +253,8 @@
         }
 
         .hero-logo-wrap {
-            width: 90px;
-            height: 90px;
+            width: 110px;
+            height: 110px;
             flex-shrink: 0;
             border-radius: 50%;
             overflow: hidden;
@@ -260,8 +265,8 @@
         }
 
         .hero-logo {
-            width: 90px;
-            height: 90px;
+            width: 110px;
+            height: 110px;
             object-fit: cover;
             display: block;
         }
@@ -424,16 +429,20 @@
         }
 
         .member-avatar {
-            width: 3rem;
-            height: 3rem;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
+            overflow: hidden;
             background: var(--bg-surface-hover);
             border: 1px solid var(--border-subtle);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
             margin: 0 auto 1rem;
+        }
+
+        .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .member-card h3 {
@@ -657,8 +666,8 @@
             <a href="#equipo">Equipo</a>
             <a href="http://print.sudoers.lan">Impresión</a>
         </div>
-        <a href="http://print.sudoers.lan" class="nav-pill">
-            Panel CUPS ↗
+        <a href="http://portainer.sudoers.lan" target="_blank" class="nav-pill">
+            <span class="pill-icon">🐳</span> Gestor del Servidor ↗
         </a>
     </nav>
 
@@ -793,17 +802,23 @@
 
                 <div class="team-grid reveal">
                     <div class="member-card">
-                        <div class="member-avatar">🧑‍💻</div>
+                        <div class="member-avatar">
+                            <img src="/assets/img/joauqin-debian.webp" alt="Joaquin Alessandro Felipez Rojas">
+                        </div>
                         <h3>Joaquin Alessandro Felipez Rojas</h3>
                         <p class="member-role">DNS · Mail · Portainer</p>
                     </div>
                     <div class="member-card">
-                        <div class="member-avatar">🧑‍💻</div>
+                        <div class="member-avatar">
+                            <img src="/assets/img/nicolas-cachyos.webp" alt="Nicolas Sebastian Reguerin Meneses">
+                        </div>
                         <h3>Nicolas Sebastian Reguerin Meneses</h3>
                         <p class="member-role">DHCP · Base de datos</p>
                     </div>
                     <div class="member-card">
-                        <div class="member-avatar">🧑‍💻</div>
+                        <div class="member-avatar">
+                            <img src="/assets/img/david-endevour.webp" alt="David Willy Cruz Huanca">
+                        </div>
                         <h3>David Willy Cruz Huanca</h3>
                         <p class="member-role">Web · Archivos</p>
                     </div>
