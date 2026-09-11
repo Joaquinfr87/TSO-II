@@ -94,12 +94,6 @@
             letter-spacing: -0.01em;
         }
 
-        .nav-logo {
-            height: 1.75rem;
-            width: auto;
-            border-radius: 4px;
-        }
-
         .nav-links {
             display: flex;
             align-items: center;
@@ -251,6 +245,25 @@
 
         .hero-meta .meta-icon {
             font-size: 1rem;
+        }
+
+        .hero-logo-wrap {
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--border-subtle);
+            box-shadow: 0 0 30px rgba(88, 166, 255, 0.3);
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .hero-logo {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            display: block;
         }
 
         /* ═══════════════════════════════════════════════════
@@ -542,26 +555,17 @@
                 grid-template-columns: 1fr;
             }
 
-        .hero-logo-wrap {
-            width: 100px;
-            height: 100px;
-            flex-shrink: 0;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-            border: 2px solid var(--border-subtle);
-            box-shadow: 0 0 30px rgba(88, 166, 255, 0.3);
-            animation: fadeInUp 0.8s ease-out 0.1s both;
-        }
+            .hero-logo-wrap {
+                width: 70px;
+                height: 70px;
+            }
 
-        .hero-logo {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            display: block;
-        }
+            .hero-logo {
+                width: 70px;
+                height: 70px;
+            }
 
-        .hero-meta {
+            .hero-meta {
                 flex-direction: column;
                 gap: 0.75rem;
             }
@@ -588,7 +592,6 @@
     <!-- Navigation -->
     <nav>
         <a href="/" class="nav-brand">
-            <img src="/assets/img/logo-sudoers.png" alt="Sudoers" class="nav-logo">
             sudoers.lan
         </a>
         <div class="nav-links">
@@ -611,7 +614,7 @@
                 Todos los servicios operativos
             </div>
             <div class="hero-logo-wrap">
-                <img src="/assets/img/logo-sudoers.png" alt="Sudoers Logo" class="hero-logo">
+                <img src="/assets/img/logo-sudoers.webp" alt="Sudoers Logo" class="hero-logo">
             </div>
             <h1>
                 Servidor<br><span class="highlight">Debian</span>
