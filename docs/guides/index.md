@@ -33,6 +33,7 @@ Cada guía debe incluir:
 - [Evitar la suspensión al cerrar la tapa (laptop como servidor)](./laptop-siempre-encendida.md)
 - [Instalar paquetes en un servidor sin internet: proxy APT y NAT](./proxy-apt-y-nat.md)
 - [Servidor de archivos multi-protocolo: Samba, NFS y Filebrowser](./servidor-archivos.md)
+- [Hardening de seguridad: nftables + SSH + fail2ban](./hardening-seguridad.md)
 
 ## Cómo continuar
 
