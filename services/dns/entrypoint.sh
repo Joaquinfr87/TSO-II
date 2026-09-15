@@ -85,7 +85,7 @@ cat > /etc/bind/named.conf.options << 'EOF'
 options {
     directory "/var/cache/bind";
     listen-on port 53 { any; };
-    listen-on-v6 port 53 { any; };
+    listen-on-v6 { none; };
     recursion yes;
     allow-query { any; };
     dnssec-validation auto;

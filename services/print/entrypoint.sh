@@ -25,11 +25,9 @@ touch /var/log/cups/page_log
 cupsd -f &
 CUPSD_PID=$!
 
-sleep 2
-
-# Esperar a que CUPS esté listo (reintentar hasta 15 veces)
+# Esperar a que CUPS esté listo (reintentar hasta 30 veces)
 echo ">>> Esperando que CUPS inicie..."
-for i in $(seq 1 15); do
+for i in $(seq 1 30); do
     if lpstat -h localhost:631 -r &>/dev/null; then
         echo ">>> CUPS listo."
         break
@@ -45,20 +43,37 @@ done
 export CUPS_DATADIR=/usr/share/cups
 
 # Verificar que la impresora virtual PDF exista, si no crearla
+# (con reintentos porque CUPS a veces responde lpstat antes de
+#  estar listo para operaciones de admin)
 if ! lpstat -h localhost:631 -p PDF &>/dev/null; then
     echo ">>> Creando impresora virtual PDF..."
-    lpadmin -h localhost:631 -p PDF \
-        -E \
-        -v "cups-pdf:/" \
-        -m lsb/usr/cups-pdf/CUPS-PDF_opt.ppd \
-        -o printer-is-shared=true \
-        -o job-sheets=none
-    echo ">>> Impresora virtual PDF creada correctamente."
+    PDF_CREATED=1
+    for i in $(seq 1 30); do
+        if lpadmin -h localhost:631 -p PDF \
+            -E \
+            -v "cups-pdf:/" \
+            -m lsb/usr/cups-pdf/CUPS-PDF_opt.ppd \
+            -o printer-is-shared=true \
+            -o job-sheets=none 2>/dev/null; then
+            echo ">>> Impresora virtual PDF creada correctamente."
+            PDF_CREATED=0
+            break
+        fi
+        sleep 1
+    done
+    if [ "$PDF_CREATED" -ne 0 ]; then
+        echo "ERROR: no se pudo crear la impresora PDF"
+        exit 1
+    fi
 fi
 
 # Activar la cola para aceptar trabajos
-cupsenable -h localhost:631 PDF
-cupsaccept -h localhost:631 PDF
+for i in $(seq 1 15); do
+    if cupsenable -h localhost:631 PDF && cupsaccept -h localhost:631 PDF; then
+        break
+    fi
+    sleep 1
+done
 
 echo "============================================"
 echo "  Servidor de impresión CUPS iniciado"
