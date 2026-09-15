@@ -1,0 +1,66 @@
+% ============================================================================
+%  CAPÍTULO III: ALCANCE Y LÍMITES
+% ============================================================================
+
+\section{Alcance y Límites}
+
+\subsection{Alcance}
+
+El presente informe documenta la configuración de los servicios de red del
+proyecto integrador. Las actividades realizadas incluyen:
+
+\subsubsection{Servidor de correo electrónico}
+\begin{itemize}
+  \item Instalación de Postfix y Dovecot en Debian con el administrador de
+        paquetes APT.
+  \item Configuración de Postfix como servidor SMTP con habilitación del
+        puerto 587 (submission) para clientes autenticados.
+  \item Configuración de Dovecot como servidor IMAP/POP3 con autenticación
+        de usuarios vía SASL.
+  \item Generación de certificados SSL/TLS auto-firmados para la protección
+        de las conexiones (STARTTLS).
+  \item Creación de usuarios de correo (joaquin, nicolas, david) con
+        estructura de buzón en formato Maildir.
+  \item Configuración del servidor DNS (BIND9) con registros MX y A para
+        el dominio \texttt{sudoers.lan}.
+  \item Pruebas de conectividad y envío/recepción de correo entre usuarios
+        del dominio.
+\end{itemize}
+
+\subsubsection{Servidor de archivos}
+\begin{itemize}
+  \item Instalación de Samba en Debian.
+  \item Configuración de carpetas compartidas con permisos por usuario.
+  \item Pruebas de acceso desde clientes Windows y Linux.
+\end{itemize}
+
+\subsection{Límites}
+
+Los siguientes aspectos no forman parte de este informe:
+
+\begin{itemize}
+  \item Seguridad avanzada del servidor de correo (antispam, antivirus,
+        listas negras).
+  \item Integración con dominios de correo externos o configuración de relay
+        con proveedores externos.
+  \item Configuración de registros SPF, DKIM o DMARC para autenticación de
+        dominio.
+  \item Desarrollo detallado del servidor de archivos (corresponde a otro
+        integrante del equipo).
+\end{itemize}
+
+\subsection{Entorno de trabajo}
+
+El entorno utilizado para la configuración consta de los siguientes
+componentes:
+
+\begin{itemize}
+  \item \textbf{Servidor:} máquina con Debian 12 (Bookworm) ejecutando los
+        servicios de correo y archivos directamente en el sistema operativo.
+  \item \textbf{Red interna:} red administrativa \texttt{192.168.0.0/24}
+        (WLO1) y red de usuarios \texttt{192.168.20.0/24} (ENO1).
+  \item \textbf{Servicios instalados:} BIND9 (DNS), Postfix + Dovecot
+        (correo), Samba (archivos).
+  \item \textbf{Resolución de nombres:} servidor DNS propio que resuelve el
+        dominio \texttt{sudoers.lan} para todos los servicios.
+\end{itemize}

@@ -141,6 +141,43 @@
 % --- Gráficos y diagramas ----------------------------------------------------
 \RequirePackage{graphicx}
 \graphicspath{{figuras/}}   % las imágenes se colocan en la carpeta figuras/
+
+% \capturaAPA{<label>}{<título>}{<archivo.png>}{<descripción de la captura>}
+% Muestra la figura si la imagen existe; si no, un recuadro indicativo con la
+% descripcion de la captura pendiente y el nombre del archivo esperado.
+\newcommand{\capturaAPA}[4]{%
+  \begin{lrbox}{\cajaContenido}%
+    \IfFileExists{figuras/#3}{%
+      \includegraphics[width=0.85\linewidth,height=0.55\textheight,keepaspectratio]{#3}%
+    }{%
+      \fbox{%
+        \begin{minipage}{0.8\linewidth}
+          \centering\setstretch{1}%
+          \vspace{2.2cm}%
+          {\small\textbf{CAPTURA PENDIENTE}\\[4pt]
+           \footnotesize Guardar como: \texttt{#3}\\[6pt]
+           \footnotesize #4}%
+          \vspace{2.2cm}%
+        \end{minipage}%
+      }%
+    }%
+  \end{lrbox}%
+  \noindent
+  \if\relax\detokenize{#1}\relax
+    \captionsetup{width=\linewidth}\captionof{figure}{#2}%
+  \else
+    \captionsetup{width=\linewidth}\captionof{figure}{#2}\label{#1}%
+  \fi
+  \par
+  \begin{center}%
+    \parbox{\wd\cajaContenido}{%
+      \setstretch{1}%
+      \usebox{\cajaContenido}%
+    }%
+  \end{center}%
+  \vspace{6pt}%
+  {\setstretch{1}\footnotesize\textbf{FUENTE:}#4}%
+}
 % Escalar figuras automáticamente para que no se salgan del texto
 \newsavebox{\imagenBox}
 \newcommand{\figuraSegura}[3][0.90]{%

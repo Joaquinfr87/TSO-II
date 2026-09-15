@@ -1,0 +1,457 @@
+% ============================================================================
+%  CAPÍTULO IV: DESARROLLO DEL TRABAJO
+% ============================================================================
+
+\section{Desarrollo del trabajo}
+
+Este capítulo documenta el proceso de configuración del servidor de correo
+electrónico sobre Debian, desde la instalación de los paquetes necesarios
+hasta las pruebas de conectividad y envío/recepción entre clientes.
+
+% -------------------------------------------------------
+\subsection{Arquitectura del sistema}
+
+El servidor de correo se implementó utilizando dos servicios principales
+instalados directamente en Debian:
+
+\begin{itemize}
+  \item \textbf{Postfix} (MTA): gestiona el envío y recepción de correo
+        electrónico vía el protocolo SMTP, habilitando los puertos 25
+        (transferencia entre servidores) y 587 (submission para clientes).
+  \item \textbf{Dovecot} (MDA): proporciona acceso a los buzones de correo
+        mediante los protocolos IMAP (puerto 143) y POP3 (puerto 110),
+        además de validar las credenciales de los usuarios a través del
+        subsistema SASL.
+\end{itemize}
+
+La autenticación de usuarios se realiza a través de Dovecot, que conecta con
+Postfix mediante un socket Unix (\texttt{/var/run/dovecot/private/auth}). De
+esta forma, el cliente envía sus credenciales al servidor de submission
+(puerto 587), Postfix las delega a Dovecot para su validación, y solo tras
+la autenticación exitosa se acepta el envío del mensaje.
+
+La figura \ref{fig:arquitectura-correo} presenta la arquitectura general
+del servicio de correo implementado.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm and 1.8cm,
+    servicio/.style={draw, rounded corners, minimum width=2.6cm,
+                     minimum height=0.9cm, align=center, font=\small},
+    cliente/.style={draw, circle, minimum size=1cm, font=\small},
+    linea/.style={-Stealth, thick}
+  ]
+  % Nodos
+  \node[servicio] (postfix) {Postfix\\{\footnotesize SMTP}};
+  \node[servicio, right=of postfix] (dovecot) {Dovecot\\{\footnotesize IMAP/POP3}};
+  \node[cliente, left=of postfix] (c1) {C1};
+  \node[cliente, below=of c1] (c2) {C2};
+  \node[servicio, below=of postfix, yshift=-0.4cm] (dns) {BIND9\\{\footnotesize DNS}};
+
+  % Conexiones
+  \draw[linea] (c1.east) -- node[above,font=\scriptsize]{587} (postfix.west);
+  \draw[linea] (c2.east) -| (postfix.west);
+  \draw[linea] (postfix.east) -- node[above,font=\scriptsize]{SASL} (dovecot.west);
+  \draw[linea, dashed] (postfix.south) -- (dns.north);
+\end{tikzpicture}
+\caption{Arquitectura del servicio de correo: Postfix, Dovecot y DNS}
+\label{fig:arquitectura-correo}
+\end{figure}
+
+% -------------------------------------------------------
+\subsection{Instalación de paquetes}
+
+Todos los paquetes necesarios se instalaron con el administrador APT de Debian.
+El siguiente comando instala las dependencias principales para el servicio de
+correo:
+
+\begin{lstlisting}[style=terminal]
+$ apt update
+$ apt install -y postfix dovecot-core dovecot-lmtpd \
+  libsasl2-modules openssl
+\end{lstlisting}
+
+\begin{itemize}
+  \item \textbf{postfix}: servidor MTA que gestiona el envío y recepción de
+        correo vía SMTP.
+  \item \textbf{dovecot-core} y \textbf{dovecot-lmtpd}: servidor IMAP/POP3
+        con soporte LMTP para la entrega local de correo.
+  \item \textbf{openssl}: necesario para la generación de certificados SSL/TLS
+        auto-firmados.
+  \item \textbf{libsasl2-modules}: módulos SASL para la autenticación de
+        usuarios.
+\end{itemize}
+
+% -------------------------------------------------------
+\subsection{Configuración del servidor DNS (BIND9)}
+
+Antes de configurar el servidor de correo, es necesario contar con un servidor
+DNS funcional que resuelva el dominio del proyecto. Se instaló BIND9 con las
+siguientes características en la zona directa para \texttt{sudoers.lan}:
+
+\begin{itemize}
+  \item Registro MX que apunta al servidor de correo: \texttt{@ IN MX 10 mail.sudoers.lan}.
+  \item Registro A para el servidor de correo: \texttt{mail IN A 192.168.0.105}.
+  \item Soporte exclusivo IPv4 (\texttt{-4} en el comando \texttt{named}) para
+        evitar errores de conectividad con servidores raíz IPv6.
+\end{itemize}
+
+La verificación del registro MX se realizó con el comando \texttt{dig}:
+
+\begin{lstlisting}[style=terminal]
+$ dig +short MX sudoers.lan
+10 mail.sudoers.lan.
+
+$ dig +short mail.sudoers.lan
+192.168.0.105
+\end{lstlisting}
+
+\capturaAPA{fig:dig-mx}{Verificaci\'on del registro MX del dominio \texttt{sudoers.lan} con \texttt{dig}}{captura-dig-mx.png}{Captura de pantalla mostrando la salida de \texttt{dig +short MX sudoers.lan} y \texttt{dig +short mail.sudoers.lan} en la terminal.}
+
+% -------------------------------------------------------
+\subsection{Configuración del servidor SMTP (Postfix)}
+
+La configuración de Postfix se realizó editando el archivo
+\texttt{/etc/postfix/main.cf}. A continuación se describen las configuraciones
+más relevantes.
+
+\subsubsection{Identidad del servidor}
+
+Se estableció el nombre completo del dominio del correo y el dominio base del
+proyecto:
+
+\begin{lstlisting}[style=terminal]
+myhostname = mail.sudoers.lan
+mydomain   = sudoers.lan
+myorigin   = $mydomain
+\end{lstlisting}
+
+\subsubsection{Redes permitidas}
+
+El servidor acepta conexiones desde todas las redes privadas, lo que permite
+el acceso desde cualquier máquina de la red interna:
+
+\begin{lstlisting}[style=terminal]
+mynetworks = 127.0.0.0/8, 10.0.0.0/8,
+             172.16.0.0/12, 192.168.0.0/16
+\end{lstlisting}
+
+\subsubsection{Almacenamiento de correo}
+
+Se configuró el formato Maildir para el almacenamiento de mensajes, que
+almacena cada correo como un archivo individual dentro del directorio
+\texttt{Maildir/} del home de cada usuario:
+
+\begin{lstlisting}[style=terminal]
+home_mailbox = Maildir/
+\end{lstlisting}
+
+\subsubsection{Autenticación SASL}
+
+La autenticación de usuarios se delega a Dovecot mediante el socket SASL.
+Esta configuración permite que Postfix valide las credenciales sin gestionar
+directamente la base de usuarios:
+
+\begin{lstlisting}[style=terminal]
+smtpd_sasl_type           = dovecot
+smtpd_sasl_path           = private/auth
+smtpd_sasl_auth_enable    = yes
+smtpd_sasl_security_options = noanonymous
+\end{lstlisting}
+
+\subsubsection{Restricciones de envío}
+
+El servidor acepta envíos únicamente de usuarios autenticados, rechazando
+cualquier intento no autorizado:
+
+\begin{lstlisting}[style=terminal]
+smtpd_recipient_restrictions =
+    permit_sasl_authenticated,
+    permit_mynetworks,
+    reject_unauth_destination
+\end{lstlisting}
+
+\subsubsection{Habilitación de STARTTLS}
+
+Para proteger las conexiones se habilitó STARTTLS con certificados
+auto-firmados. El certificado se genera con \texttt{openssl} directamente
+en el servidor:
+
+\begin{lstlisting}[style=terminal]
+# Generar certificado auto-firmado
+$ openssl req -new -x509 -days 3650 -nodes \
+    -out /etc/ssl/certs/mail.pem \
+    -keyout /etc/ssl/private/mail.key \
+    -subj "/CN=mail.sudoers.lan/O=TSO-II/C=AR"
+$ chmod 600 /etc/ssl/private/mail.key
+\end{lstlisting}
+
+Y en \texttt{/etc/postfix/main.cf} se habilita TLS:
+
+\begin{lstlisting}[style=terminal]
+smtpd_use_tls            = yes
+smtpd_tls_cert_file      = /etc/ssl/certs/mail.pem
+smtpd_tls_key_file       = /etc/ssl/private/mail.key
+smtpd_tls_security_level = may
+\end{lstlisting}
+
+\subsubsection{Puerto de submission (587)}
+
+El puerto 587 se habilitó en \texttt{/etc/postfix/master.cf} para clientes
+que desean enviar correo con autenticación. Esta configuración exige STARTTLS
+antes de aceptar autenticación (\texttt{smtpd\_tls\_security\_level=encrypt}):
+
+\begin{lstlisting}[style=terminal]
+submission inet n  -  n  -  -  smtpd
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_sasl_type=dovecot
+  -o smtpd_sasl_path=private/auth
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+\end{lstlisting}
+
+La configuración aplicada por Postfix se puede verificar con
+\texttt{postconf -n}, que muestra los parámetros efectivos del servidor:
+
+\capturaAPA{fig:postconf}{Par\'ametros efectivos de Postfix con \texttt{postconf -n}}{captura-postconf.png}{Captura de pantalla de la terminal ejecutando \texttt{postconf -n}, mostrando la configuraci\'on activa (myhostname, mynetworks, smtpd\_sasl\_*).}
+
+% -------------------------------------------------------
+\subsection{Configuración del servidor IMAP/POP3 (Dovecot)}
+
+Dovecot se configura mediante varios archivos en \texttt{/etc/dovecot/conf.d/}.
+Los más relevantes son:
+
+\subsubsection{Protocolos habilitados}
+
+Se habilitaron los protocolos IMAP y POP3 en el archivo
+\texttt{10-master.conf}:
+
+\begin{lstlisting}[style=terminal]
+protocols = imap pop3
+\end{lstlisting}
+
+\subsubsection{Autenticación}
+
+En \texttt{10-auth.conf} se habilitaron los mecanismos de autenticación
+\texttt{plain} y \texttt{login}, que permiten la autenticación con
+credenciales en texto plano protegidas por STARTTLS:
+
+\begin{lstlisting}[style=terminal]
+auth_mechanisms = plain login
+\end{lstlisting}
+
+\subsubsection{Formato de buzón}
+
+En \texttt{10-mail.conf} se configuró el formato Maildir, compatible con
+la configuración de Postfix:
+
+\begin{lstlisting}[style=terminal]
+mail_location = maildir:~/Maildir
+\end{lstlisting}
+
+\subsubsection{Certificado SSL}
+
+En \texttt{10-ssl.conf} se habilitó SSL con los certificados auto-firmados
+generados previamente:
+
+\begin{lstlisting}[style=terminal]
+ssl = required
+ssl_cert  = /etc/ssl/certs/mail.pem
+ssl_key   = /etc/ssl/private/mail.key
+\end{lstlisting}
+
+\capturaAPA{fig:doveconf}{Verificaci\'on de la configuraci\'on de Dovecot con \texttt{doveconf -n}}{captura-doveconf.png}{Captura de pantalla de la terminal ejecutando \texttt{doveconf -n}, mostrando los par\'ametros activos de Dovecot.}
+
+% -------------------------------------------------------
+\subsection{Creación de usuarios y estructura de buzón}
+
+Los usuarios de correo se crean como usuarios del sistema en Debian. Cada
+usuario necesita una estructura Maildir para almacenar sus mensajes:
+
+\begin{lstlisting}[style=terminal]
+# Crear usuarios del sistema
+$ useradd -m -s /bin/bash joaquin
+$ echo "joaquin:adminpass123" | chpasswd
+$ useradd -m -s /bin/bash nicolas
+$ echo "nicolas:adminpass123" | chpasswd
+$ useradd -m -s /bin/bash david
+$ echo "david:adminpass123" | chpasswd
+
+# Crear estructura Maildir para cada usuario
+$ for USER in joaquin nicolas david; do
+    mkdir -p /home/$USER/Maildir/{cur,new,tmp}
+    chown -R $USER:$USER /home/$USER/Maildir
+    chmod -R 700 /home/$USER/Maildir
+  done
+\end{lstlisting}
+
+Una vez creados los usuarios, se inician los servicios de Postfix y Dovecot:
+
+\begin{lstlisting}[style=terminal]
+$ systemctl restart postfix
+$ systemctl restart dovecot
+$ systemctl enable postfix dovecot
+\end{lstlisting}
+
+% -------------------------------------------------------
+\subsection{Pruebas de conectividad}
+
+Se realizaron pruebas de conectividad desde la máquina cliente hacia el
+servidor de correo en \texttt{192.168.0.105}, verificando el estado de
+todos los puertos relevantes:
+
+\begin{lstlisting}[style=terminal]
+$ ping -c 2 192.168.0.105
+2 packets transmitted, 2 received, 0% packet loss
+
+$ for p in 25 110 143 587 993 995; do
+    timeout 3 bash -c "echo > /dev/tcp/192.168.0.105/$p" \
+      && echo "puerto $p: ABIERTO"
+  done
+puerto 25: ABIERTO
+puerto 110: ABIERTO
+puerto 143: ABIERTO
+puerto 587: ABIERTO
+puerto 993: ABIERTO
+puerto 995: ABIERTO
+\end{lstlisting}
+
+Todos los puertos del servicio de correo respondieron correctamente,
+confirmando que el firewall permite el tráfico y que los servicios
+están operativos.
+
+\capturaAPA{fig:puertos-abiertos}{Comprobaci\'on de conectividad a los puertos del servidor de correo}{captura-puertos.png}{Captura de pantalla mostrando la salida del bucle que verifica los puertos 25, 110, 143, 587, 993 y 995 desde la m\'aquina cliente.}
+
+% -------------------------------------------------------
+\subsection{Pruebas de envío y recepción de correo}
+
+La verificación del envío de correo se realizó utilizando el protocolo SMTP
+directamente, probando la autenticación y el envío entre usuarios del dominio.
+
+\subsubsection{Prueba SMTP básica}
+
+Se verificó que el servidor SMTP responda correctamente con el banner
+esperado:
+
+\begin{lstlisting}[style=terminal]
+$ echo "QUIT" | nc 192.168.0.105 25
+220 mail.sudoers.lan ESMTP Postfix
+221 2.0.0 Bye
+\end{lstlisting}
+
+\capturaAPA{fig:smtp-banner}{Banner de bienvenida del servidor SMTP (Postfix)}{captura-smtp-banner.png}{Captura de pantalla de la conexi\'on SMTP al puerto 25 mostrando el banner \texttt{220 mail.sudoers.lan ESMTP Postfix}.}
+
+\subsubsection{Prueba IMAP}
+
+Se verificó que Dovecot responda y muestre las capacidades disponibles:
+
+\begin{lstlisting}[style=terminal]
+$ echo "LOGOUT" | nc 192.168.0.105 143
+* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE
+  IDLE LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN]
+  Dovecot (Debian) ready.
+\end{lstlisting}
+
+\capturaAPA{fig:imap-capabilities}{Capacidades del servidor IMAP (Dovecot)}{captura-imap.png}{Captura de pantalla de la conexi\'on IMAP al puerto 143 mostrando el banner de capacidades de Dovecot.}
+
+\subsubsection{Verificación de STARTTLS}
+
+Se comprobó que el servidor acepte la conexión TLS con certificado
+auto-firmado:
+
+\begin{lstlisting}[style=terminal]
+$ openssl s_client -connect 192.168.0.105:587 -starttls smtp
+subject=CN=mail.sudoers.lan, O=TSO-II, C=AR
+Verify return code: 18 (self-signed certificate)
+\end{lstlisting}
+
+\capturaAPA{fig:starttls}{Negociaci\'on STARTTLS con el servidor SMTP}{captura-starttls.png}{Captura de pantalla de \texttt{openssl s\_client} mostrando el sujeto del certificado y el c\'odigo de verificaci\'on 18 (self-signed).}
+
+\subsubsection{Envío con autenticación (swaks)}
+
+Para una prueba completa de envío se utilizó la herramienta \texttt{swaks}
+(\textit{Swiss Army Knife for SMTP}):
+
+\begin{lstlisting}[style=terminal]
+$ swaks --to joaquin@sudoers.lan \
+    --from nicolas@sudoers.lan \
+    --server 192.168.0.105 --port 587 \
+    --auth LOGIN --auth-user nicolas \
+    --auth-password adminpass123 \
+    --header "Subject: Prueba" \
+    --body "Hola Joaquin, esto es una prueba."
+\end{lstlisting}
+
+La figura \ref{fig:swaks} muestra el resultado exitoso del envío.
+
+\capturaAPA{fig:swaks}{Env\'io de correo autenticado con \texttt{swaks}}{captura-swaks.png}{Captura de pantalla de \texttt{swaks} mostrando el intercambio SMTP, la autenticaci\'on exitosa y el c\'odigo 250 para la aceptaci\'on del mensaje.}
+
+La respuesta del servidor confirmó el envío exitoso del mensaje. Para
+verificar la recepción, se puede inspeccionar el buzón del destinatario:
+
+\begin{lstlisting}[style=terminal]
+$ ls /home/joaquin/Maildir/new/
+1627...joaquin@sudoers.lan
+\end{lstlisting}
+
+\capturaAPA{fig:maildir-receptor}{Buz\'on Maildir del destinatario con el mensaje recibido}{captura-maildir.png}{Captura de pantalla listando el contenido de \texttt{/home/joaquin/Maildir/new/} donde aparece el correo recibido.}
+
+% -------------------------------------------------------
+\subsection{Acceso desde clientes}
+
+Para acceder al correo desde un cliente como Thunderbird, se utilizó la
+siguiente configuración:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Parámetro} & \textbf{Valor} \\
+\midrule
+Servidor de entrada (IMAP) & mail.sudoers.lan \\
+Puerto de entrada & 143 \\
+Seguridad de entrada & STARTTLS \\
+Servidor de salida (SMTP) & mail.sudoers.lan \\
+Puerto de salida & 587 \\
+Seguridad de salida & STARTTLS \\
+Autenticación & Contraseña normal \\
+Usuario & joaquin \\
+\bottomrule
+\end{tabular}
+\caption{Configuración del cliente de correo Thunderbird}
+\label{tab:config-thunderbird}
+\end{table}
+
+Debido a que el certificado es auto-firmado, el cliente mostrará un aviso
+de seguridad la primera vez que se conecte. Es necesario aceptar la excepción
+de seguridad manualmente para permitir la conexión.
+
+\capturaAPA{fig:thunderbird}{Cliente de correo Thunderbird conectado al servidor IMAP con los mensajes recibidos}{captura-thunderbird.png}{Captura de pantalla del cliente Thunderbird mostrando la cuenta joaquin@sudoers.lan conectada y la bandeja de entrada con el mensaje de prueba recibido.}
+
+% -------------------------------------------------------
+\subsection{Usuarios creados}
+
+El servidor de correo cuenta con los siguientes usuarios, creados como
+usuarios del sistema Debian:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Usuario} & \textbf{Contraseña} & \textbf{Correo} \\
+\midrule
+joaquin & adminpass123 & joaquin@sudoers.lan \\
+nicolas & adminpass123 & nicolas@sudoers.lan \\
+david & adminpass123 & david@sudoers.lan \\
+\bottomrule
+\end{tabular}
+\caption{Usuarios del servidor de correo}
+\label{tab:usuarios-correo}
+\end{table}
+
+\begin{quote}
+\small\textit{Nota:} las contraseñas indicadas son las utilizadas en el
+entorno de laboratorio. En un entorno de producción se recomienda utilizar
+contraseñas robustas y rotarlas periódicamente.
+\end{quote}

@@ -1,0 +1,60 @@
+% ============================================================================
+%  CAPÍTULO V: CONCLUSIONES
+% ============================================================================
+
+\section{Conclusiones}
+
+La implementación del servidor de correo electrónico y la planificación del
+servidor de archivos permitieron comprender de manera integral el
+funcionamiento de los servicios de red en una organización. A continuación se
+presentan las conclusiones más relevantes.
+
+\subsection{Resultados obtenidos}
+
+El servidor de correo fue configurado exitosamente con las siguientes
+características verificadas:
+
+\begin{itemize}
+  \item Servicio SMTP habilitado en los puertos 25 y 587, con autenticación
+        obligatoria y protección STARTTLS en el puerto de submission.
+  \item Servicios IMAP (143) y POP3 (110) operativos, permitiendo a los
+        clientes acceder a sus buzones de correo de forma remota.
+  \item Resolución de nombres funcional para el dominio \texttt{sudoers.lan},
+        incluyendo registro MX y registros A para los servicios de correo.
+  \item Usuarios creados y autenticados correctamente a través del subsistema
+        SASL integrado en Dovecot.
+  \item Envío y recepción de correo entre usuarios del dominio verificado
+        satisfactoriamente.
+  \item Servidor de archivos Samba (SMB) configurado con carpetas compartidas
+        y permisos por usuario (desarrollado por otro integrante del equipo).
+\end{itemize}
+
+\subsection{Dificultades encontradas}
+
+Durante la configuración se encontraron las siguientes dificultades:
+
+\begin{itemize}
+  \item \textbf{Certificados auto-firmados:} el uso de certificados SSL
+        auto-firmados genera avisos de seguridad en los clientes de correo,
+        requiriendo la aceptación manual de excepciones. En un entorno de
+        producción se recomienda utilizar certificados emitidos por una
+        autoridad de certificación confiable.
+  \item \textbf{Orden de inicio de servicios:} el servidor de correo depende
+        del correcto funcionamiento del servidor DNS para resolver registros
+        internos, lo que requiere un orden específico en el inicio de los
+        servicios del sistema.
+  \item \textbf{Coincidencia de configuración Postfix-Dovecot:} ambos
+        servicios deben coincidir en el formato de buzón (Maildir) y en la
+        ruta del socket de autenticación SASL, lo que requiere atención
+        detallada durante la configuración.
+\end{itemize}
+
+\subsection{Aprendizajes}
+
+El taller permitió desarrollar competencias prácticas en administración de
+servicios de red, comprendiendo la arquitectura cliente-servidor del correo
+electrónico y la importancia de la configuración correcta de los registros
+DNS para la operación de servicios internos. Asimismo, se valoró la
+instalación y configuración manual de servicios en Debian, lo que brinda un
+entendimiento profundo del funcionamiento de cada componente del sistema
+operativo y de la interacción entre los distintos servicios de red.

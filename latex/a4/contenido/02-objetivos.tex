@@ -1,0 +1,32 @@
+% ============================================================================
+%  CAPÍTULO II: OBJETIVOS DEL TRABAJO
+% ============================================================================
+
+\section{Objetivos del trabajo}
+
+\subsection{Objetivo general}
+
+Comprender el funcionamiento de un servidor de correo electrónico (SMTP/IMAP/POP3)
+y un servidor de archivos (SMB/CIFS), su configuración e integración con los
+servicios de resolución de nombres (DNS) y autenticación de usuarios en un
+entorno de red administrado con Debian.
+
+\subsection{Objetivos específicos}
+
+\begin{itemize}
+  \item Comprender la arquitectura y el funcionamiento del protocolo SMTP,
+        incluyendo los roles de MTA y la transferencia de mensajes entre
+        servidores.
+  \item Implementar un servidor de correo electrónico funcional utilizando
+        Postfix (envío) y Dovecot (recepción) instalados directamente
+        sobre Debian.
+  \item Configurar los registros DNS (MX y A) necesarios para la resolución
+        del dominio de correo dentro de la red interna.
+  \item Configurar la autenticación de usuarios mediante SASL y la protección
+        de las conexiones con STARTTLS mediante certificados auto-firmados.
+  \item Instalar y configurar Samba (SMB) para compartir carpetas en la red
+        local, asignando permisos de acceso por usuario.
+  \item Documentar el proceso completo de instalación, configuración y prueba
+        de ambos servicios, incluyendo comandos, archivos de configuración y
+        evidencias de cada paso.
+\end{itemize}

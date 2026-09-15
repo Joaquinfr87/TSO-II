@@ -1,0 +1,39 @@
+% ============================================================================
+%  CAPÍTULO I: INTRODUCCIÓN
+% ============================================================================
+
+\section{Introducción}
+
+En toda organización, la infraestructura de red constituye el pilar sobre el
+cual se sustentan las operaciones diarias y la comunicación interna. Dentro de
+esta infraestructura, los servidores de correo electrónico y los servidores de
+archivos desempeñan un rol fundamental: el primero permite el intercambio formal
+de información entre los miembros de la organización, mientras que el segundo
+centraliza el almacenamiento y la distribución de documentos\footnote{Stewart
+y Chapple, 2017.}
+
+El protocolo \textit{Simple Mail Transfer Protocol} (SMTP) es el estándar
+utilizado globalmente para la transferencia de correo electrónico entre servidores
+y para el envío de mensajes desde clientes hacia el servidor\footnote{Postel,
+1982.} En combinación con protocolos de acceso como \textit{Internet Message
+Access Protocol} (IMAP) y \textit{Post Office Protocol} (POP3), se completa el
+ciclo de vida de un correo: desde su recepción en el servidor hasta su lectura
+por parte del usuario final.
+
+Por otro lado, el protocolo \textit{Server Message Block} (SMB) —implementado
+en Linux mediante Samba— permite compartir archivos y carpetas entre máquinas
+de distintos sistemas operativos en una red local, ofreciendo permisos de
+acceso a nivel de recurso compartido y a nivel NTFS
+(Linux equivalent)\footnote{Tanenbaum y Wetherall, 2017.}
+
+El presente informe documenta la configuración de un servidor de correo
+electrónico y la planificación de un servidor de archivos dentro del proyecto
+integrador del curso de Taller de Sistemas Operativos II. Para el correo se
+implementó un entorno basado en Postfix (MTA) y Dovecot (servidor IMAP/POP3)
+sobre Debian, con resolución de nombres vía BIND9 y autenticación de usuarios
+a través del subsistema SASL integrado en Dovecot. El servidor de archivos
+utiliza Samba (SMB) con carpetas compartidas y permisos de acceso por usuario,
+siendo desarrollado por otro integrante del equipo.
+
+Este capítulo introduce el contexto general del taller y presenta la importancia
+de estos servicios de red en la administración de sistemas informáticos.
