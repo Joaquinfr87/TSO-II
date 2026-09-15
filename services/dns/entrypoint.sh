@@ -201,4 +201,4 @@ echo "  Dominio: ${DOMAIN}"
 echo "============================================"
 
 cd /var/cache/bind
-exec /usr/sbin/named -g -u bind -c /etc/bind/named.conf
+exec /usr/sbin/named -4 -g -u bind -c /etc/bind/named.conf
