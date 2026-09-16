@@ -23,7 +23,7 @@
 %  DATOS DEL DOCUMENTO  (editar aquí)
 %  Los valores entre corchetes [ ] son marcadores que debes reemplazar.
 % ============================================================================
-\newcommand{\tituloDocumento}{Configuraci\'on de Servidor de Correo Electr\'onico (SMTP/IMAP/POP3)}
+\newcommand{\tituloDocumento}{Configuraci\'on de Servidor de Correo Electr\'onico y Servidor de Archivos}
 \newcommand{\equipo}{Grupo 1 Sudoers}
 \newcommand{\integrantes}{%
   Joaquin Alessandro Felipez Rojas \par
@@ -45,16 +45,13 @@
 % --- Portada (no muestra número y no cuenta: el entorno titlepage parte de 1)
 \input{formato/portada}
 
-% --- Resumen y palabras clave ----------------------------------------------
-\input{contenido/00-resumen}
-
 % --- Índices ----------------------------------------------------------------
 \newpage
-\tableofcontents
+{\indicesCompactos\tableofcontents}
 \newpage
-\listoftables
+{\indicesCompactos\listoftables}
 \newpage
-\listoffigures
+{\indicesCompactos\listoffigures}
 \clearpage
 
 % --- Cambio a numeración arábiga para el contenido principal -------------
@@ -72,22 +69,29 @@
 \input{contenido/01-introduccion}
 
 % --- CAPÍTULO II -------------------------------------------------------------
-\caratulaCapitulo{CAP\'ITULO II}{OBJETIVOS DEL TRABAJO}
+\caratulaCapitulo{CAP\'ITULO II}{OBJETIVOS, ALCANCE Y L\'IMITES}
 \input{contenido/02-objetivos}
-
-% --- CAPÍTULO III ------------------------------------------------------------
-\caratulaCapitulo{CAP\'ITULO III}{ALCANCE Y L\'IMITES}
 \input{contenido/03-alcance}
 
-% --- CAPÍTULO IV -------------------------------------------------------------
-\caratulaCapitulo{CAP\'ITULO IV}{DESARROLLO DEL TRABAJO}
+% --- CAPÍTULO III ------------------------------------------------------------
+\caratulaCapitulo{CAP\'ITULO III}{DESARROLLO DEL TRABAJO}
 \input{contenido/04-desarrollo}
 
 % --- CONCLUSIONES ---------------------------------------------------------
 \newpage
 \encabezadoCapitulo{CONCLUSIONES}{}
 \addcontentsline{toc}{part}{CONCLUSIONES}
+\begingroup
+\setcounter{capitulo}{4}
+\setcounter{section}{0}
+\renewcommand{\thesection}{4.}
+\renewcommand{\theHsection}{4.}
+\renewcommand{\thesubsection}{4.\arabic{subsection}}
+\renewcommand{\theHsubsection}{4.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{4.\arabic{subsection}.\arabic{subsubsection}}
+\renewcommand{\theHsubsubsection}{4.\arabic{subsection}.\arabic{subsubsection}}
 \input{contenido/05-conclusiones}
+\endgroup
 
 % --- Referencias (APA) ------------------------------------------------------
 \newpage

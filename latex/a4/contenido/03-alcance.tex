@@ -1,5 +1,5 @@
 % ============================================================================
-%  CAPÍTULO III: ALCANCE Y LÍMITES
+%  CAPÍTULO II: ALCANCE Y LÍMITES
 % ============================================================================
 
 \section{Alcance y Límites}
@@ -7,12 +7,11 @@
 \subsection{Alcance}
 
 El presente informe documenta la configuración de los servicios de red del
-proyecto integrador. Las actividades realizadas incluyen:
+proyecto. Las actividades realizadas incluyen:
 
 \subsubsection{Servidor de correo electrónico}
 \begin{itemize}
-  \item Instalación de Postfix y Dovecot en Debian con el administrador de
-        paquetes APT.
+  \item Instalación de Postfix y Dovecot en Debian.
   \item Configuración de Postfix como servidor SMTP con habilitación del
         puerto 587 (submission) para clientes autenticados.
   \item Configuración de Dovecot como servidor IMAP/POP3 con autenticación
@@ -29,9 +28,27 @@ proyecto integrador. Las actividades realizadas incluyen:
 
 \subsubsection{Servidor de archivos}
 \begin{itemize}
-  \item Instalación de Samba en Debian.
-  \item Configuración de carpetas compartidas con permisos por usuario.
-  \item Pruebas de acceso desde clientes Windows y Linux.
+  \item Instalación de Samba, NFS y Filebrowser en el servidor Debian,
+        integrando los tres protocolos de compartición de archivos.
+  \item Configuración del protocolo SMB/CIFS mediante Samba con
+        autenticación de usuario (\texttt{security = user}) sobre el
+        directorio compartido \texttt{/srv/share}.
+  \item Configuración del protocolo NFS mediante
+        \texttt{nfs-kernel-server} con exportación del directorio compartido
+        (\texttt{rw, sync, no\_root\_squash, fsid=0}).
+  \item Configuración de la interfaz web Filebrowser con base de
+        datos SQLite y creación automática de usuarios.
+  \item Creación y sincronización de usuarios en los tres servicios mediante
+        el script de aprovisionamiento \texttt{entrypoint.sh} (usuarios del
+        sistema, usuarios Samba y usuarios Filebrowser).
+  \item Asignación de permisos con máscaras de creación (\texttt{create mask}
+        y \texttt{directory mask}) que garantizan la interoperabilidad entre
+        los protocolos.
+  \item Despliegue de los servicios sobre Debian con almacenamiento persistente
+        de los datos compartidos.
+  \item Pruebas de acceso desde clientes mediante SMB (explorador gráfico y
+        \texttt{smbclient}), NFS (montaje manual y automático) y Filebrowser
+        (navegador web).
 \end{itemize}
 
 \subsection{Límites}
@@ -45,8 +62,15 @@ Los siguientes aspectos no forman parte de este informe:
         con proveedores externos.
   \item Configuración de registros SPF, DKIM o DMARC para autenticación de
         dominio.
-  \item Desarrollo detallado del servidor de archivos (corresponde a otro
-        integrante del equipo).
+  \item Seguridad avanzada del servidor de archivos: no se implementó cifrado
+        TLS/SSL para SMB ni autenticación Kerberos; las credenciales se
+        transmiten en texto plano dentro de la red local de laboratorio.
+  \item Integración del servidor de archivos con Active Directory o
+        controladores de dominio Windows; Samba opera como servidor
+        independiente (\texttt{standalone server}).
+  \item Cuotas de disco y auditoría detallada de accesos por usuario en el
+        servidor de archivos.
+  \item Alta disponibilidad y replicación de datos en ambos servicios.
 \end{itemize}
 
 \subsection{Entorno de trabajo}
@@ -55,12 +79,21 @@ El entorno utilizado para la configuración consta de los siguientes
 componentes:
 
 \begin{itemize}
-  \item \textbf{Servidor:} máquina con Debian 12 (Bookworm) ejecutando los
-        servicios de correo y archivos directamente en el sistema operativo.
-  \item \textbf{Red interna:} red administrativa \texttt{192.168.0.0/24}
+  \item Servidor: máquina física con Debian 12 (Bookworm) donde se
+        instalan el servidor de correo, el servidor de archivos y el servidor
+        DNS (BIND9).
+  \item Despliegue: los servicios se ejecutan en contenedores Docker
+        sobre Debian, conectados por la red interna \texttt{tso-net}.
+  \item Red interna: red administrativa \texttt{192.168.0.0/24}
         (WLO1) y red de usuarios \texttt{192.168.20.0/24} (ENO1).
-  \item \textbf{Servicios instalados:} BIND9 (DNS), Postfix + Dovecot
-        (correo), Samba (archivos).
-  \item \textbf{Resolución de nombres:} servidor DNS propio que resuelve el
+  \item Servicios: Postfix + Dovecot (correo) y Samba + NFS +
+        Filebrowser (archivos).
+  \item Resolución de nombres: servidor DNS propio que resuelve el
         dominio \texttt{sudoers.lan} para todos los servicios.
+  \item Clientes de prueba: máquinas Linux (Thunderbird,
+        \texttt{swaks}, \texttt{smbclient}, montajes NFS), clientes Windows y
+        navegadores web.
+  \item Usuarios: \texttt{nicolas}, \texttt{joaquin} y
+        \texttt{david}, con credenciales sincronizadas entre los servicios
+        de correo y de archivos.
 \end{itemize}

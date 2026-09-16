@@ -1,12 +1,21 @@
 % ============================================================================
-%  CAPÍTULO IV: DESARROLLO DEL TRABAJO
+%  CAPÍTULO III: DESARROLLO DEL TRABAJO
 % ============================================================================
 
 \section{Desarrollo del trabajo}
 
-Este capítulo documenta el proceso de configuración del servidor de correo
-electrónico sobre Debian, desde la instalación de los paquetes necesarios
-hasta las pruebas de conectividad y envío/recepción entre clientes.
+Este capítulo documenta el proceso de configuración de los dos servicios
+principales del proyecto sobre Debian. En primer lugar se aborda el servidor
+de correos y, a continuación, el servidor de archivos. Cada bloque describe
+desde la instalación de los paquetes necesarios hasta las pruebas de acceso
+realizadas desde los clientes.
+
+\section{Servidor de correos}
+
+El servidor de correos se implementó sobre Debian. A continuación se describe
+el proceso completo: instalación de los paquetes necesarios, configuración de
+los servicios SMTP (Postfix), IMAP/POP3 (Dovecot) y DNS, creación de usuarios
+y las pruebas de conectividad y envío/recepción entre clientes.
 
 % -------------------------------------------------------
 \subsection{Arquitectura del sistema}
@@ -15,10 +24,10 @@ El servidor de correo se implementó utilizando dos servicios principales
 instalados directamente en Debian:
 
 \begin{itemize}
-  \item \textbf{Postfix} (MTA): gestiona el envío y recepción de correo
+  \item Postfix (MTA): gestiona el envío y recepción de correo
         electrónico vía el protocolo SMTP, habilitando los puertos 25
         (transferencia entre servidores) y 587 (submission para clientes).
-  \item \textbf{Dovecot} (MDA): proporciona acceso a los buzones de correo
+  \item Dovecot (MDA): proporciona acceso a los buzones de correo
         mediante los protocolos IMAP (puerto 143) y POP3 (puerto 110),
         además de validar las credenciales de los usuarios a través del
         subsistema SASL.
@@ -33,31 +42,28 @@ la autenticación exitosa se acepta el envío del mensaje.
 La figura \ref{fig:arquitectura-correo} presenta la arquitectura general
 del servicio de correo implementado.
 
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-    node distance=1.2cm and 1.8cm,
-    servicio/.style={draw, rounded corners, minimum width=2.6cm,
-                     minimum height=0.9cm, align=center, font=\small},
-    cliente/.style={draw, circle, minimum size=1cm, font=\small},
-    linea/.style={-Stealth, thick}
-  ]
-  % Nodos
-  \node[servicio] (postfix) {Postfix\\{\footnotesize SMTP}};
-  \node[servicio, right=of postfix] (dovecot) {Dovecot\\{\footnotesize IMAP/POP3}};
-  \node[cliente, left=of postfix] (c1) {C1};
-  \node[cliente, below=of c1] (c2) {C2};
-  \node[servicio, below=of postfix, yshift=-0.4cm] (dns) {BIND9\\{\footnotesize DNS}};
+\figuraAPA{fig:arquitectura-correo}{Arquitectura del servicio de correo: Postfix, Dovecot y DNS}{%
+  \begin{tikzpicture}[
+      node distance=1.2cm and 1.8cm,
+      servicio/.style={draw, rounded corners, minimum width=2.6cm,
+                       minimum height=0.9cm, align=center, font=\small},
+      cliente/.style={draw, circle, minimum size=1cm, font=\small},
+      linea/.style={-Stealth, thick}
+    ]
+    % Nodos
+    \node[servicio] (postfix) {Postfix\\{\footnotesize SMTP}};
+    \node[servicio, right=of postfix] (dovecot) {Dovecot\\{\footnotesize IMAP/POP3}};
+    \node[cliente, left=of postfix] (c1) {C1};
+    \node[cliente, below=of c1] (c2) {C2};
+    \node[servicio, below=of postfix, yshift=-0.4cm] (dns) {BIND9\\{\footnotesize DNS}};
 
-  % Conexiones
-  \draw[linea] (c1.east) -- node[above,font=\scriptsize]{587} (postfix.west);
-  \draw[linea] (c2.east) -| (postfix.west);
-  \draw[linea] (postfix.east) -- node[above,font=\scriptsize]{SASL} (dovecot.west);
-  \draw[linea, dashed] (postfix.south) -- (dns.north);
-\end{tikzpicture}
-\caption{Arquitectura del servicio de correo: Postfix, Dovecot y DNS}
-\label{fig:arquitectura-correo}
-\end{figure}
+    % Conexiones
+    \draw[linea] (c1.east) -- node[above,font=\scriptsize]{587} (postfix.west);
+    \draw[linea] (c2.east) -| (postfix.west);
+    \draw[linea] (postfix.east) -- node[above,font=\scriptsize]{SASL} (dovecot.west);
+    \draw[linea, dashed] (postfix.south) -- (dns.north);
+  \end{tikzpicture}%
+}{Elaboración propia.}
 
 % -------------------------------------------------------
 \subsection{Instalación de paquetes}
@@ -73,13 +79,13 @@ $ apt install -y postfix dovecot-core dovecot-lmtpd \
 \end{lstlisting}
 
 \begin{itemize}
-  \item \textbf{postfix}: servidor MTA que gestiona el envío y recepción de
+  \item postfix: servidor MTA que gestiona el envío y recepción de
         correo vía SMTP.
-  \item \textbf{dovecot-core} y \textbf{dovecot-lmtpd}: servidor IMAP/POP3
+  \item dovecot-core y dovecot-lmtpd: servidor IMAP/POP3
         con soporte LMTP para la entrega local de correo.
-  \item \textbf{openssl}: necesario para la generación de certificados SSL/TLS
+  \item openssl: necesario para la generación de certificados SSL/TLS
         auto-firmados.
-  \item \textbf{libsasl2-modules}: módulos SASL para la autenticación de
+  \item libsasl2-modules: módulos SASL para la autenticación de
         usuarios.
 \end{itemize}
 
@@ -405,22 +411,26 @@ siguiente configuración:
 
 \begin{table}[H]
 \centering
-\begin{tabular}{ll}
-\toprule
-\textbf{Parámetro} & \textbf{Valor} \\
-\midrule
-Servidor de entrada (IMAP) & mail.sudoers.lan \\
-Puerto de entrada & 143 \\
-Seguridad de entrada & STARTTLS \\
-Servidor de salida (SMTP) & mail.sudoers.lan \\
-Puerto de salida & 587 \\
-Seguridad de salida & STARTTLS \\
-Autenticación & Contraseña normal \\
-Usuario & joaquin \\
-\bottomrule
-\end{tabular}
 \caption{Configuración del cliente de correo Thunderbird}
 \label{tab:config-thunderbird}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{ll}
+    \toprule
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \midrule
+    Servidor de entrada (IMAP) & mail.sudoers.lan \\
+    Puerto de entrada & 143 \\
+    Seguridad de entrada & STARTTLS \\
+    Servidor de salida (SMTP) & mail.sudoers.lan \\
+    Puerto de salida & 587 \\
+    Seguridad de salida & STARTTLS \\
+    Autenticación & Contraseña normal \\
+    Usuario & joaquin \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
 \end{table}
 
 Debido a que el certificado es auto-firmado, el cliente mostrará un aviso
@@ -437,17 +447,21 @@ usuarios del sistema Debian:
 
 \begin{table}[H]
 \centering
-\begin{tabular}{lll}
-\toprule
-\textbf{Usuario} & \textbf{Contraseña} & \textbf{Correo} \\
-\midrule
-joaquin & adminpass123 & joaquin@sudoers.lan \\
-nicolas & adminpass123 & nicolas@sudoers.lan \\
-david & adminpass123 & david@sudoers.lan \\
-\bottomrule
-\end{tabular}
 \caption{Usuarios del servidor de correo}
 \label{tab:usuarios-correo}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{lll}
+    \toprule
+    \textbf{Usuario} & \textbf{Contraseña} & \textbf{Correo} \\
+    \midrule
+    joaquin & adminpass123 & joaquin@sudoers.lan \\
+    nicolas & adminpass123 & nicolas@sudoers.lan \\
+    david & adminpass123 & david@sudoers.lan \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
 \end{table}
 
 \begin{quote}
@@ -455,3 +469,406 @@ david & adminpass123 & david@sudoers.lan \\
 entorno de laboratorio. En un entorno de producción se recomienda utilizar
 contraseñas robustas y rotarlas periódicamente.
 \end{quote}
+
+% ============================================================================
+%  BLOQUE 2: SERVIDOR DE ARCHIVOS
+% ============================================================================
+
+\section{Servidor de archivos}
+
+El servidor de archivos se implementó como un servicio \emph{multi-protocolo}
+sobre Debian que integra Samba (SMB/CIFS), NFS y el explorador web
+Filebrowser. Los tres protocolos operan sobre el mismo directorio compartido
+(\texttt{/srv/share}), de modo que un archivo creado desde cualquier protocolo
+es inmediatamente accesible desde los demás.
+
+\subsection{Arquitectura del servicio}
+
+Cada protocolo cubre un caso de uso distinto: SMB/CIFS da servicio a clientes
+Windows y a gestores de archivos gráficos, NFS permite el montaje de alto
+rendimiento en estaciones Linux y HTTP (Filebrowser) ofrece acceso desde
+cualquier navegador. La figura \ref{fig:arquitectura-archivos} presenta la
+arquitectura general del servicio y la tabla \ref{tab:protocolos-archivos}
+resume los protocolos utilizados.
+
+\figuraAPA{fig:arquitectura-archivos}{Arquitectura multi-protocolo del servidor de archivos}{%
+  \begin{tikzpicture}[
+      node distance=1.2cm and 1.8cm,
+      servicio/.style={draw, rounded corners, minimum width=2.6cm,
+                       minimum height=0.9cm, align=center, font=\small},
+      linea/.style={-Stealth, thick}
+    ]
+    \node[servicio] (samba) {Samba\\{\footnotesize SMB/CIFS}};
+    \node[servicio, right=of samba] (nfs) {NFS\\{\footnotesize NFS Kernel}};
+    \node[servicio, right=of nfs] (web) {Filebrowser\\{\footnotesize HTTP}};
+    \node[servicio, below=of nfs] (datos) {/srv/share};
+    \draw[linea] (samba.south) -- (datos.north);
+    \draw[linea] (nfs.south) -- (datos.north);
+    \draw[linea] (web.south) -- (datos.north);
+  \end{tikzpicture}%
+}{Elaboración propia.}
+
+\begin{table}[H]
+\centering
+\caption{Protocolos de compartición de archivos del servidor}
+\label{tab:protocolos-archivos}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{@{}p{2.6cm}p{3.6cm}p{7.3cm}@{}}
+    \toprule
+    \textbf{Protocolo} & \textbf{Tecnología} & \textbf{Caso de uso} \\
+    \midrule
+    SMB/CIFS & Samba & Clientes Windows y gestores de archivos gráficos \\
+    NFS & NFS kernel server & Montaje de alto rendimiento en estaciones Linux \\
+    HTTP & Filebrowser & Acceso gráfico desde cualquier navegador \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
+\end{table}
+
+Los puertos utilizados por el servicio se resumen en la tabla
+\ref{tab:puertos-archivos}.
+
+\begin{table}[H]
+\centering
+\caption{Puertos de los servicios del servidor de archivos}
+\label{tab:puertos-archivos}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{@{}p{2.2cm}p{3cm}p{6.5cm}@{}}
+    \toprule
+    \textbf{Puerto} & \textbf{Protocolo} & \textbf{Servicio} \\
+    \midrule
+    445 & TCP & Samba (SMB/CIFS) \\
+    139 & TCP & Samba (compatibilidad NetBIOS) \\
+    2049 & TCP/UDP & NFS \\
+    111 & TCP/UDP & rpcbind (portmapper) \\
+    80 & TCP & Filebrowser (HTTP) \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
+\end{table}
+
+% -------------------------------------------------------
+\subsection{Instalación de paquetes}
+
+Los paquetes necesarios para los tres protocolos se instalaron desde los
+repositorios de Debian:
+
+\begin{lstlisting}[style=terminal]
+$ apt install -y samba nfs-kernel-server rpcbind curl ca-certificates
+\end{lstlisting}
+
+La tabla \ref{tab:paquetes-archivos} resume la función de cada paquete.
+
+\begin{table}[H]
+\centering
+\caption{Función de los paquetes instalados}
+\label{tab:paquetes-archivos}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{@{}p{4.2cm}p{9.3cm}@{}}
+    \toprule
+    \textbf{Paquete} & \textbf{Función} \\
+    \midrule
+    \texttt{samba} & Daemon \texttt{smbd} para la compartición de archivos vía SMB/CIFS \\
+    \texttt{nfs-kernel-server} & Daemons \texttt{rpc.nfsd} y \texttt{rpc.mountd} para el servicio NFS \\
+    \texttt{rpcbind} & Mapeador de puertos RPC, requerido por NFS \\
+    \texttt{curl} y \texttt{ca-certificates} & Descarga del binario de Filebrowser \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
+\end{table}
+
+El binario de Filebrowser se descarga desde el repositorio oficial del
+proyecto y se instala de forma autónoma:
+
+\begin{lstlisting}[style=terminal]
+$ curl -fsSL \
+  https://github.com/filebrowser/filebrowser/releases/latest/download/\
+linux-amd64-filebrowser.tar.gz \
+  | tar -xzv -C /usr/local/bin filebrowser
+\end{lstlisting}
+
+% -------------------------------------------------------
+\subsection{Configuración de Samba (SMB/CIFS)}
+
+Samba es el protocolo principal para la compartición con clientes Windows y
+gestores de archivos gráficos. La configuración se realiza en
+\texttt{/etc/samba/smb.conf}:
+
+\begin{lstlisting}[style=terminal]
+[global]
+    workgroup = WORKGROUP
+    server string = Servidor de archivos TSO-II
+    security = user
+    map to guest = bad user
+    server role = standalone server
+    log file = /var/log/samba/log.%m
+    max log size = 1000
+
+[compartido]
+    path = /srv/share
+    browseable = yes
+    writable = yes
+    guest ok = no
+    valid users = nicolas joaquin david
+    force user = root
+    create mask = 0666
+    directory mask = 0777
+    force create mode = 0666
+    force directory mode = 0777
+\end{lstlisting}
+
+\begin{table}[H]
+\centering
+\caption{Directivas principales de la configuración de Samba}
+\label{tab:directivas-samba}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{@{}p{4.5cm}p{9cm}@{}}
+    \toprule
+    \textbf{Directiva} & \textbf{Justificación} \\
+    \midrule
+    \texttt{security = user} & El cliente debe autenticarse con usuario y contraseña registrados en Samba \\
+    \texttt{map to guest = bad user} & Los usuarios no válidos se rechazan; no se otorga acceso como invitado \\
+    \texttt{guest ok = no} & Se prohíbe el acceso anónimo al recurso compartido \\
+    \texttt{valid users} & Lista blanca de usuarios autorizados: nicolas, joaquin y david \\
+    \texttt{force user = root} & Las operaciones se ejecutan como root, evitando conflictos de propiedad entre protocolos \\
+    \texttt{create mask / directory mask} & 0666 y 0777: los archivos creados por un protocolo son accesibles por los demás \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
+\end{table}
+
+% -------------------------------------------------------
+\subsection{Configuración de NFS}
+
+NFS permite el montaje directo del directorio compartido desde estaciones
+Linux con acceso de alto rendimiento a nivel de kernel. La exportación se
+configura en \texttt{/etc/exports}:
+
+\begin{lstlisting}[style=terminal]
+/srv/share *(rw,sync,no_subtree_check,no_root_squash,fsid=0)
+\end{lstlisting}
+
+\begin{table}[H]
+\centering
+\caption{Opciones de exportación NFS}
+\label{tab:opciones-nfs}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{@{}p{4.2cm}p{9.3cm}@{}}
+    \toprule
+    \textbf{Opción} & \textbf{Justificación} \\
+    \midrule
+    \texttt{rw} & Permite lectura y escritura \\
+    \texttt{sync} & Las escrituras se confirman en disco antes de responder, priorizando la integridad de los datos \\
+    \texttt{no\_subtree\_check} & Mejora el rendimiento y evita problemas al renombrar archivos \\
+    \texttt{no\_root\_squash} & El usuario root del cliente conserva sus privilegios en el servidor \\
+    \texttt{fsid=0} & Define \texttt{/srv/share} como la raíz virtual del espacio NFSv4 \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
+\end{table}
+
+\begin{quote}
+\small\textit{Concepto clave:} con NFSv4 la exportación marcada con
+\texttt{fsid=0} actúa como raíz virtual. Por ello el cliente monta la ruta
+remota \texttt{/} y no \texttt{/srv/share}.
+\end{quote}
+
+% -------------------------------------------------------
+\subsection{Configuración de Filebrowser (interfaz web)}
+
+Filebrowser proporciona un explorador de archivos web accesible desde
+cualquier navegador sin instalar software adicional en el cliente. La
+inicialización de su base de datos SQLite y la creación de usuarios se
+realizan con los siguientes comandos:
+
+\begin{lstlisting}[style=terminal]
+$ filebrowser config init --database /database/filebrowser.db
+$ filebrowser config set --database /database/filebrowser.db \
+    --root /srv/share \
+    --address 0.0.0.0 \
+    --port 80 \
+    --auth.method json
+
+$ for u in nicolas joaquin david; do
+    filebrowser users add "$u" "sudoers123456" \
+      --perm.admin=true --database /database/filebrowser.db
+  done
+\end{lstlisting}
+
+El directorio raíz expuesto por la interfaz web (\texttt{--root}) es el mismo
+\texttt{/srv/share} que comparten Samba y NFS, lo que garantiza la
+consistencia de los datos entre los tres protocolos.
+
+% -------------------------------------------------------
+\subsection{Creación y administración de usuarios}
+
+El script de inicio \texttt{entrypoint.sh} actúa como orquestador del arranque
+y sincroniza las credenciales de los usuarios en los tres sistemas: usuarios
+del sistema Linux, usuarios de Samba y usuarios de Filebrowser.
+
+\begin{lstlisting}[style=terminal]
+# Crear usuarios del sistema y registrarlos en Samba
+for u in nicolas joaquin david; do
+    useradd -M -g users -s /usr/sbin/nologin "$u"
+    (echo "sudoers123456"; echo "sudoers123456") | smbpasswd -a -s "$u"
+done
+\end{lstlisting}
+
+La opción \texttt{-M} evita la creación de un directorio home y
+\texttt{-s /usr/sbin/nologin} impide el inicio de sesión interactivo de los
+usuarios por seguridad. Con \texttt{smbpasswd -a -s} se registra al usuario en
+la base de datos de contraseñas de Samba de forma no interactiva. Las
+credenciales quedan unificadas para los tres servicios:
+
+\begin{table}[H]
+\centering
+\caption{Credenciales unificadas del servidor de archivos}
+\label{tab:usuarios-archivos}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{@{}p{4.2cm}p{9.3cm}@{}}
+    \toprule
+    \textbf{Campo} & \textbf{Valor} \\
+    \midrule
+    Usuarios & nicolas, joaquin, david \\
+    Contraseña & sudoers123456 \\
+    Workgroup (Samba) & WORKGROUP \\
+    Dominio & sudoers.lan \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
+\end{table}
+
+\begin{quote}
+\small\textit{Nota:} NFS no utiliza autenticación por usuario y contraseña;
+el control de acceso se realiza por host/IP y por los permisos del kernel.
+\end{quote}
+
+% -------------------------------------------------------
+\subsection{Arranque de los servicios y asignación de permisos}
+
+El arranque de los servicios sigue la siguiente secuencia:
+
+\begin{itemize}
+  \item \texttt{rpcbind}: registra los servicios RPC necesarios para
+        NFS.
+  \item \texttt{exportfs -arv}: reexporta todas las entradas de
+        \texttt{/etc/exports}.
+  \item \texttt{rpc.nfsd 8}: inicia ocho hilos del servidor NFS del
+        kernel.
+  \item \texttt{rpc.mountd}: atiende las solicitudes de montaje NFS
+        de los clientes.
+  \item Filebrowser: sirve la interfaz web en el puerto 80.
+  \item \texttt{smbd}: daemon principal de Samba que mantiene activo
+        el servicio.
+\end{itemize}
+
+En cuanto a los permisos, en un servidor de archivos tradicional sobre
+Windows Server se distinguen dos capas: los permisos NTFS, aplicados a nivel
+del sistema de archivos local, y los permisos de recurso compartido, aplicados
+a nivel de red. En este proyecto, al operar sobre un sistema de archivos
+Linux, se utilizan los equivalentes Unix que se muestran en la tabla
+\ref{tab:permisos-unix}.
+
+\begin{table}[H]
+\centering
+\caption{Equivalencia de permisos: Windows vs. Unix}
+\label{tab:permisos-unix}
+\contenidoConFuente{%
+  \begin{tablaAPA}
+    \begin{tabular}{@{}p{5cm}p{9cm}@{}}
+    \toprule
+    \textbf{Concepto Windows} & \textbf{Equivalente en el proyecto} \\
+    \midrule
+    Permisos NTFS & Permisos de archivo Unix (\texttt{chmod 777 /srv/share}) \\
+    Permisos de recurso compartido & Directivas en \texttt{smb.conf} \\
+    Control de acceso por usuario & \texttt{security = user} con credenciales en \texttt{smbpasswd} \\
+    Permisos NFS & Opciones de exportación en \texttt{/etc/exports} \\
+    \bottomrule
+    \end{tabular}
+  \end{tablaAPA}%
+}{Elaboración propia.}
+\end{table}
+
+La política de permisos aplicada garantiza la interoperabilidad: el directorio
+\texttt{/srv/share} tiene permisos \texttt{777}, Samba fuerza las máscaras
+\texttt{0666} (archivos) y \texttt{0777} (directorios), y NFS exporta con
+\texttt{no\_root\_squash}. De este modo, un archivo creado por un protocolo
+no queda bloqueado para los demás.
+
+% -------------------------------------------------------
+\subsection{Pruebas de acceso desde clientes}
+
+\paragraph{Acceso por SMB (SMB/CIFS)}
+
+Desde un gestor de archivos gráfico (Thunar, Nautilus, explorador de Windows)
+se accede al recurso escribiendo la URL \texttt{smb://192.168.0.105/compartido}
+y autenticándose con las credenciales de los usuarios. Desde la terminal se
+puede usar el cliente \texttt{smbclient}:
+
+\begin{lstlisting}[style=terminal]
+$ smbclient //192.168.0.105/compartido -U david
+Password:
+smb: \> ls
+  .   D        0  ...
+smb: \> mkdir documentos
+smb: \> put informe.pdf
+\end{lstlisting}
+
+\capturaAPA{fig:archivos-smbclient}{Conexi\'on al recurso compartido con
+\texttt{smbclient}}{captura-archivos-smbclient.png}{Captura de pantalla de una sesi\'on \texttt{smbclient} contra \texttt{//192.168.0.105/compartido}, autenticada con el usuario david y mostrando la lista de archivos y la creaci\'on de un directorio.}
+
+\paragraph{Acceso por web (Filebrowser)}
+
+La interfaz web de Filebrowser se abre desde cualquier navegador en
+\texttt{http://files.sudoers.lan} permitiendo navegar, subir y descargar
+archivos arrastrando y soltando.
+
+\capturaAPA{fig:archivos-filebrowser}{Interfaz web de Filebrowser
+autenticada}{captura-archivos-filebrowser.png}{Captura de pantalla del navegador mostrando la pantalla de inicio de sesi\'on de Filebrowser y el explorador de archivos de \texttt{/srv/share}.}
+
+\paragraph{Acceso por NFS}
+
+En el cliente Linux se instala \texttt{nfs-common} y se realiza el montaje:
+
+\begin{lstlisting}[style=terminal]
+# En el cliente Debian/Ubuntu
+$ apt install nfs-common
+
+# Verificar las exportaciones del servidor
+$ showmount -e 192.168.0.105
+Export list for 192.168.0.105:
+/srv/share *
+
+# Montaje manual (la raiz NFSv4 es /)
+$ sudo mkdir -p /mnt/servidor_archivos
+$ sudo mount -t nfs4 192.168.0.105:/ /mnt/servidor_archivos
+\end{lstlisting}
+
+Para el montaje automático al inicio del sistema se añade la siguiente línea a
+\texttt{/etc/fstab}:
+
+\begin{lstlisting}[style=terminal]
+192.168.0.105:/  /mnt/servidor_archivos  nfs  defaults,_netdev,x-systemd.automount  0  0
+\end{lstlisting}
+
+La opción \texttt{\_netdev} indica que el montaje requiere red y
+\texttt{x-systemd.automount} retrasa el montaje hasta que haya conectividad,
+evitando errores durante el arranque.
+
+\capturaAPA{fig:archivos-nfs}{Verificaci\'on de exportaciones y montaje
+NFS}{captura-archivos-nfs.png}{Captura de pantalla mostrando la salida de \texttt{showmount -e 192.168.0.105} y el montaje de \texttt{/} en \texttt{/mnt/servidor\_archivos}.}
+
+En clientes Windows la carpeta puede asignarse como unidad de red usando la
+ruta \texttt{\textbackslash{}\textbackslash{}192.168.0.105\textbackslash{}compartido}.

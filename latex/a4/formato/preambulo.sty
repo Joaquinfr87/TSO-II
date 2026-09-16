@@ -100,13 +100,13 @@
   \parbox{\wd\cajaContenido}{%
     \usebox{\cajaContenido}\par
     \vspace{6pt}%
-    {\setstretch{1}\footnotesize\textbf{FUENTE:} #2}%
+    {\centering\setstretch{1}\footnotesize\textbf{FUENTE:} #2\par}%
   }%
 }
 % \fuenteAPA{<texto>} para contenido a ancho completo (p. ej. terminal).
 \newcommand{\fuenteAPA}[1]{%
   \vspace{4pt}%
-  {\setstretch{1}\footnotesize\textbf{FUENTE:} #1}%
+  {\centering\setstretch{1}\footnotesize\textbf{FUENTE:} #1\par}%
 }
 
 % \figuraAPA{<label>}{<título>}{<contenido>}{<fuente>} coloca el título de la
@@ -119,6 +119,7 @@
 \newcommand{\figuraAPA}[4]{%
   \begin{lrbox}{\cajaContenido}#3\end{lrbox}%
   % Título a ancho del texto (no se achica en imágenes estrechas)
+  \vspace{12pt}%
   \noindent
   \if\relax\detokenize{#1}\relax
     \captionsetup{width=\linewidth}\captionof{figure}{#2}%
@@ -133,9 +134,9 @@
       \usebox{\cajaContenido}%
     }%
   \end{center}%
-  % FUENTE alineada igual que el título (a ancho del texto)
+  % FUENTE centrada igual que el título (a ancho del texto)
   \vspace{6pt}%
-  {\setstretch{1}\footnotesize\textbf{FUENTE:} #4}%
+  {\centering\setstretch{1}\footnotesize\textbf{FUENTE:} #4\par}%
 }
 
 % --- Gráficos y diagramas ----------------------------------------------------
@@ -162,6 +163,7 @@
       }%
     }%
   \end{lrbox}%
+  \vspace{12pt}%
   \noindent
   \if\relax\detokenize{#1}\relax
     \captionsetup{width=\linewidth}\captionof{figure}{#2}%
@@ -176,7 +178,7 @@
     }%
   \end{center}%
   \vspace{6pt}%
-  {\setstretch{1}\footnotesize\textbf{FUENTE:}#4}%
+  {\centering\setstretch{1}\footnotesize\textbf{FUENTE:} #4\par}%
 }
 % Escalar figuras automáticamente para que no se salgan del texto
 \newsavebox{\imagenBox}
@@ -264,6 +266,48 @@
 \renewcommand{\cfttabaftersnum}{:}
 \setlength{\cftfignumwidth}{7em}
 \setlength{\cfttabnumwidth}{7em}
+
+% --- Índices: entradas alineadas a la izquierda y compactas ------------------
+% Cada entrada se compone con el texto a la izquierda y el número de página
+% alineado a la columna derecha (borde del texto). Se redefinen las macros
+% \l@... que lee \contentsline desde los archivos .toc/.lot/.lof.
+\makeatletter
+\newcommand{\entradaIndice}[2]{%
+  \par\noindent
+  \begingroup
+  \renewcommand{\numberline}[1]{##1\,}%
+  \makebox[\linewidth][l]{%
+    \parbox[b]{\dimexpr\linewidth-\@pnumwidth-4pt\relax}{\raggedright\strut#1\strut}%
+    \hspace{4pt}\hb@xt@\@pnumwidth{\hfil\strut#2}%
+  }%
+  \endgroup
+  \par}
+% Variante para figuras y tablas: el número se imprime con dos puntos y un
+% espacio (FIGURA 1: <texto> / TABLA 1: <texto>), como en las leyendas.
+\newcommand{\entradaIndiceNum}[2]{%
+  \par\noindent
+  \begingroup
+  \renewcommand{\numberline}[1]{##1:\,}%
+  \makebox[\linewidth][l]{%
+    \parbox[b]{\dimexpr\linewidth-\@pnumwidth-4pt\relax}{\raggedright\strut#1\strut}%
+    \hspace{4pt}\hb@xt@\@pnumwidth{\hfil\strut#2}%
+  }%
+  \endgroup
+  \par}
+\renewcommand*\l@part[2]{%
+  \addvspace{1em}%
+  \entradaIndice{\textbf{#1}}{\textbf{#2}}}
+\renewcommand*\l@section[2]{\entradaIndice{#1}{#2}}
+\renewcommand*\l@subsection[2]{\entradaIndice{#1}{#2}}
+\renewcommand*\l@subsubsection[2]{\entradaIndice{#1}{#2}}
+\renewcommand*\l@table[2]{\entradaIndiceNum{\textbf{TABLA }\ignorespaces#1}{#2}}
+\renewcommand*\l@figure[2]{\entradaIndiceNum{\textbf{FIGURA }\ignorespaces#1}{#2}}
+\makeatother
+% Interlineado 1.5 y poco espacio entre entradas para los índices.
+\newcommand{\indicesCompactos}{%
+  \setstretch{1.5}%
+  \setlength{\parskip}{1pt}%
+}
 
 % --- Hipervínculos -----------------------------------------------------------
 \RequirePackage[colorlinks=true, linkcolor=black, urlcolor=blue, citecolor=black]{hyperref}

@@ -1,15 +1,16 @@
 % ============================================================================
-%  CAPÍTULO II: OBJETIVOS DEL TRABAJO
+%  CAPÍTULO II: OBJETIVOS, ALCANCE Y LÍMITES
 % ============================================================================
 
 \section{Objetivos del trabajo}
 
 \subsection{Objetivo general}
 
-Comprender el funcionamiento de un servidor de correo electrónico (SMTP/IMAP/POP3)
-y un servidor de archivos (SMB/CIFS), su configuración e integración con los
-servicios de resolución de nombres (DNS) y autenticación de usuarios en un
-entorno de red administrado con Debian.
+Comprender el funcionamiento de un servidor de correo electrónico
+(SMTP/IMAP/POP3) y de un servidor de archivos multi-protocolo (SMB/CIFS, NFS y
+HTTP), así como su configuración e integración con los servicios de resolución
+de nombres (DNS) y autenticación de usuarios en un entorno de red administrado
+con Debian.
 
 \subsection{Objetivos específicos}
 
@@ -18,14 +19,21 @@ entorno de red administrado con Debian.
         incluyendo los roles de MTA y la transferencia de mensajes entre
         servidores.
   \item Implementar un servidor de correo electrónico funcional utilizando
-        Postfix (envío) y Dovecot (recepción) instalados directamente
-        sobre Debian.
+        Postfix (envío) y Dovecot (recepción) para el dominio
+        \texttt{sudoers.lan}.
   \item Configurar los registros DNS (MX y A) necesarios para la resolución
-        del dominio de correo dentro de la red interna.
-  \item Configurar la autenticación de usuarios mediante SASL y la protección
-        de las conexiones con STARTTLS mediante certificados auto-firmados.
-  \item Instalar y configurar Samba (SMB) para compartir carpetas en la red
-        local, asignando permisos de acceso por usuario.
+        del dominio de correo, la autenticación de usuarios mediante SASL y la
+        protección de las conexiones con STARTTLS mediante certificados
+        auto-firmados.
+  \item Implementar un servidor de archivos multi-protocolo en Debian que
+        integre Samba (SMB/CIFS), NFS y Filebrowser (HTTP) operando sobre un
+        mismo directorio compartido.
+  \item Configurar carpetas compartidas con permisos y políticas de acceso por
+        usuario, incluyendo la sincronización de credenciales entre los
+        distintos protocolos.
+  \item Realizar pruebas de acceso desde clientes heterogéneos: clientes de
+        correo (Thunderbird, \texttt{swaks}), terminales (\texttt{smbclient},
+        montaje NFS) y navegadores web (Filebrowser).
   \item Documentar el proceso completo de instalación, configuración y prueba
         de ambos servicios, incluyendo comandos, archivos de configuración y
         evidencias de cada paso.
