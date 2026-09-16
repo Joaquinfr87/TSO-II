@@ -74,7 +74,7 @@ echo ">>> Configurando Dovecot..."
 # ========================================
 echo ">>> Creando usuarios de correo..."
 
-USERS="joaquin:joaquin:adminpass123 nicolas:nicolas:adminpass123 david:david:adminpass123"
+USERS="joaquin:joaquin:adminpass123 nicolas:nicolas:adminpass123 david:david:adminpass123 zabbix:zabbix:zabbixpass"
 
 for ENTRY in $USERS; do
     IFS=: read -r USERNAME _ PASSWORD <<< "$ENTRY"
@@ -135,7 +135,7 @@ echo "  IMAPS:      ${DOMAIN}:993"
 echo "  POP3:       ${DOMAIN}:110"
 echo "  POP3S:      ${DOMAIN}:995"
 echo ""
-echo "  Usuarios: joaquin, nicolas, david"
+echo "  Usuarios: joaquin, nicolas, david, zabbix"
 echo "============================================"
 
 # Dovecot en foreground (PID 1)

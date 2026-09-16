@@ -152,6 +152,72 @@ services:
       - tso-net
 
   # ------------------------------------------------------------------
+  # Monitoreo (Zabbix 7.4) — Joaquín
+  # ------------------------------------------------------------------
+  # Stack completo: PostgreSQL + Server + Web (Nginx) + Agent2 (Docker).
+  # Acceso: https://zabbix.sudoers.lan (via reverse proxy nginx, cert autofirmado).
+  # Agentes: 10051/tcp para conexiones activas de agentes.
+  zabbix-db:
+    image: postgres:16-alpine
+    container_name: tso-zabbix-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${ZABBIX_DB_USER:-zabbix}
+      POSTGRES_PASSWORD: ${ZABBIX_DB_PASSWORD:-zabbix}
+      POSTGRES_DB: zabbix
+    volumes:
+      - zabbix_db_data:/var/lib/postgresql/data
+    networks:
+      - tso-net
+
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:7.4-ubuntu-latest
+    container_name: tso-zabbix-server
+    restart: unless-stopped
+    depends_on:
+      zabbix-db:
+        condition: service_healthy
+    environment:
+      DB_SERVER_HOST: zabbix-db
+      POSTGRES_USER: ${ZABBIX_DB_USER:-zabbix}
+      POSTGRES_PASSWORD: ${ZABBIX_DB_PASSWORD:-zabbix}
+      POSTGRES_DB: zabbix
+    ports:
+      - "10051:10051"
+    networks:
+      - tso-net
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-pgsql:7.4-ubuntu-latest
+    container_name: tso-zabbix-web
+    restart: unless-stopped
+    depends_on:
+      - zabbix-server
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      DB_SERVER_HOST: zabbix-db
+      POSTGRES_USER: ${ZABBIX_DB_USER:-zabbix}
+      POSTGRES_PASSWORD: ${ZABBIX_DB_PASSWORD:-zabbix}
+      POSTGRES_DB: zabbix
+      PHP_TZ: America/Argentina/Buenos_Aires
+    networks:
+      - tso-net
+
+  zabbix-agent-docker:
+    image: zabbix/zabbix-agent2:7.4-ubuntu-latest
+    container_name: tso-zabbix-agent-docker
+    restart: unless-stopped
+    depends_on:
+      - zabbix-server
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      ZBX_HOSTNAME: tso-docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - tso-net
+
+  # ------------------------------------------------------------------
   # Portainer (Panel web de gestión de Docker) — Joaquín
   # ------------------------------------------------------------------
   # Interfaz web para administrar contenedores, imágenes, volúmenes y redes.
@@ -177,6 +243,7 @@ volumes:
   print_output:
   db_data:
   files_db:
+  zabbix_db_data:
   portainer_data:
 
 # Red interna del proyecto.

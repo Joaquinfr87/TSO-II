@@ -1,23 +1,28 @@
 # ===================================================================
-# sshd_config — SSH Hardening del servidor TSO-II
+# sshd_config — SSH del servidor TSO-II
 # ===================================================================
 # Aplicar en el servidor:
 #   sudo cp sshd_config /etc/ssh/sshd_config
 #   sudo systemctl restart ssh
 #
-# IMPORTANTE ANTES DE APLICAR:
-#   1) Cada admin debe subir su clave pública primero:
-#      ssh-copy-id joaquin@192.168.0.105   (en cada notebook)
-#   2) Verificar que se puede entrar con la clave NUEVA en OTRA
-#      terminal antes de reiniciar ssh (para no quedar afuera).
+# Acceso por CONTRASEÑA (no se requiere clave), SOLO desde la red
+# administrativa 192.168.0.0/24 y SOLO para nicolas, david y joaquin.
+# Root tiene acceso denegado.
 # ===================================================================
 
 # ─── Acceso ───
 PermitRootLogin no
+PasswordAuthentication yes
 PubkeyAuthentication yes
-PasswordAuthentication no
-AuthenticationMethods publickey
 AllowUsers joaquin david nicolas
+
+# Solo permitir acceso desde la red administrativa 192.168.0.0/24.
+# Desde cualquier otra red se deshabilitan TODOS los métodos de
+# autenticación (el firewall del host también bloquea SSH fuera de
+# esa red; esto es una segunda capa).
+Match Address !192.168.0.0/24
+    PasswordAuthentication no
+    PubkeyAuthentication no
 
 # ─── Límites de sesión ───
 MaxAuthTries 3
