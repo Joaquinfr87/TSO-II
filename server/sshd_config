@@ -16,14 +16,6 @@ PasswordAuthentication yes
 PubkeyAuthentication yes
 AllowUsers joaquin david nicolas
 
-# Solo permitir acceso desde la red administrativa 192.168.0.0/24.
-# Desde cualquier otra red se deshabilitan TODOS los métodos de
-# autenticación (el firewall del host también bloquea SSH fuera de
-# esa red; esto es una segunda capa).
-Match Address !192.168.0.0/24
-    PasswordAuthentication no
-    PubkeyAuthentication no
-
 # ─── Límites de sesión ───
 MaxAuthTries 3
 LoginGraceTime 30
@@ -47,3 +39,15 @@ SyslogFacility AUTH
 # ─── Puerto y red ───
 Port 22
 ListenAddress 0.0.0.0
+
+# ───────────────────────────────────────────────────────────────────
+# Los bloques Match DEBEN ir al final (todo lo que sigue a un Match
+# queda condicionado a él hasta el próximo Match o el final del archivo).
+# ───────────────────────────────────────────────────────────────────
+# Solo permitir acceso desde la red administrativa 192.168.0.0/24.
+# Desde cualquier otra red se deshabilitan TODOS los métodos de
+# autenticación (el firewall del host también bloquea SSH fuera de
+# esa red; esto es una segunda capa).
+Match Address !192.168.0.0/24
+    PasswordAuthentication no
+    PubkeyAuthentication no
