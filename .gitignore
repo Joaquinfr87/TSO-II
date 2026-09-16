@@ -8,5 +8,8 @@ volumes/
 # Logs locales
 *.log
 
+# LaTeX (build artifacts, fuente vive en branch docs)
+latex/
+
 # Sistema
 .DS_Store
