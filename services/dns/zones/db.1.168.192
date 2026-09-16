@@ -17,3 +17,4 @@ $TTL    604800
 10              IN      PTR     mail.sudoers.lan.
 10              IN      PTR     files.sudoers.lan.
 10              IN      PTR     print.sudoers.lan.
+10              IN      PTR     zabbix.sudoers.lan.
