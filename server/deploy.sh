@@ -24,13 +24,13 @@ fi
 
 echo "==> [2/5] Aplicando firewall ..."
 sudo cp "$DIR/nftables.conf" /etc/nftables.conf
-# Borra SOLO nuestra tabla (ip filter) para no arrastrar las cadenas
+# Borra SOLO nuestra tabla (ip tso_filter) para no arrastrar las cadenas
 # internas de Docker. Un "flush ruleset" global rompería el NAT de los
 # contenedores (error "No chain/target/match by that name").
-sudo nft delete table ip filter 2>/dev/null || true
+sudo nft delete table ip tso_filter 2>/dev/null || true
 sudo nft -f /etc/nftables.conf
 sudo systemctl enable nftables >/dev/null 2>&1 || true
-echo "    firewall activo (tabla ip filter)"
+echo "    firewall activo (tabla ip tso_filter)"
 
 echo "==> [3/5] Respaldo y validación de sshd_config ..."
 if [ -f /etc/ssh/sshd_config ]; then
