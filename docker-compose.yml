@@ -165,6 +165,12 @@ services:
       POSTGRES_USER: ${ZABBIX_DB_USER:-zabbix}
       POSTGRES_PASSWORD: ${ZABBIX_DB_PASSWORD:-zabbix}
       POSTGRES_DB: zabbix
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ZABBIX_DB_USER:-zabbix} -d zabbix"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - zabbix_db_data:/var/lib/postgresql/data
     networks:
