@@ -85,7 +85,10 @@ services:
     container_name: tso-web
     ports:
       - "80:80"
+      - "443:443"
       - "${WEB_PORT_HTTP:-8080}:80"
+    environment:
+      WEB_DOMAIN: ${WEB_DOMAIN:-sudoers.lan}
     volumes:
       - ${WEB_SITE_DIR:-./services/web/public}:/usr/share/nginx/html:ro
     networks:
