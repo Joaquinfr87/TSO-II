@@ -99,6 +99,8 @@ La configuración de Kea se define en el archivo
 \texttt{/etc/kea/kea-dhcp4.conf}, con formato JSON. A continuación se
 describen los bloques más relevantes configurados para el proyecto.
 
+\capturaAPA{fig:captura-dhcp-conf}{Archivo de configuración \texttt{/etc/kea/kea-dhcp4.conf} con la definición de la subred, el ámbito y las opciones de red}{captura-dhcp-conf.png}{Captura de pantalla del archivo de configuración de Kea mostrando el bloque \texttt{subnet4} con el ámbito dinámico, el servidor DNS, el dominio y la puerta de enlace definidos.}
+
 \subsubsection{Interfaz y base de datos de concesiones}
 
 Kea escucha en todas las interfaces del servidor para poder atender los
@@ -224,6 +226,13 @@ red:
 $ ping -c 2 192.168.0.1
 $ ping -c 2 192.168.0.105
 \end{lstlisting}
+
+El resultado de estas pruebas confirmó que el equipo cliente, una vez
+configurado por DHCP, puede comunicarse con la puerta de enlace y con los
+servicios internos del proyecto, tal como se evidencia en la figura
+\ref{fig:captura-ping}.
+
+\capturaAPA{fig:captura-ping}{Prueba de conectividad desde el cliente hacia la puerta de enlace y el servidor}{captura-ping-router-gateway.png}{Captura de pantalla de la terminal del cliente mostrando las respuestas de \texttt{ping} hacia la puerta de enlace \texttt{192.168.0.1} y hacia el servidor del proyecto.}
 % ============================================================================
 
 \section{Servidor Web}
