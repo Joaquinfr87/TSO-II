@@ -1,0 +1,103 @@
+% ============================================================================
+%  CAPÍTULO IV: CONCLUSIONES
+% ============================================================================
+
+\section{Conclusiones}
+
+La implementación del servidor web permitió comprender de manera integral el
+funcionamiento de este servicio fundamental en una infraestructura de red. A
+continuación se presentan las conclusiones más relevantes.
+
+\subsection{Resultados obtenidos}
+
+El servidor web fue implementado exitosamente con las siguientes
+características verificadas:
+
+\begin{itemize}
+  \item Nginx operativo como servidor de contenido estático y proxy inverso,
+        atendiendo solicitudes HTTP y HTTPS en los puertos 80 y 443.
+  \item Certificado SSL/TLS auto-firmado generado automáticamente al
+        iniciar el contenedor, cubriendo el dominio base y todos los
+        subdominios del proyecto mediante \textit{wildcard}.
+  \item Redirección HTTP a HTTPS funcional en todos los virtual hosts,
+        garantizando que las comunicaciones se cifren.
+  \item Cinco proxies inversos configurados y operativos: CUPS (impresión),
+        Filebrowser (archivos), Portainer (gestión Docker), Zabbix (monitoreo)
+        y el sitio principal.
+  \item Soporte WebSocket para Portainer con timeouts extendidos.
+  \item Resolución dinámica de upstreams mediante el DNS embebido de Docker,
+        garantizando la resiliencia del servidor ante reinicios de backends.
+  \item Servidor por defecto (\texttt{default\_server}) que captura
+        peticiones por IP o dominios no declarados.
+\end{itemize}
+
+\subsection{Dificultades encontradas}
+
+Durante la configuración se encontraron las siguientes dificultades:
+
+\begin{itemize}
+  \item Certificados auto-firmados: el uso de certificados SSL
+        auto-firmados genera avisos de seguridad en los navegadores web,
+        requiriendo la aceptación manual de excepciones. En un entorno de
+        producción se recomienda utilizar certificados emitidos por una
+        autoridad de certificación confiable.
+  \item Resolución de upstreams en el arranque: Nginx falla si no puede
+        resolver un nombre de upstream al iniciar. Se solucionó utilizando
+        variables y el resolver de Docker (\texttt{127.0.0.11}), que permite
+        la resolución en tiempo de ejecución.
+  \item Soporte WebSocket para Portainer: la interfaz de Portainer
+        requiere conexiones WebSocket persistentes. Sin la configuración de
+        las cabeceras \texttt{Upgrade} y \texttt{Connection}, la interfaz no
+        funciona correctamente.
+  \item Tamaño de subida en Filebrowser: el límite predeterminado de
+        Nginx para el cuerpo de las solicitudes (1\,MB) era insuficiente para
+        la subida de archivos. Se solucionó con
+        \texttt{client\_max\_body\_size 500M}.
+\end{itemize}
+
+\subsection{Importancia del servidor web en la administración de redes}
+
+El servidor web aporta los siguientes beneficios a la administración de
+sistemas:
+
+\begin{itemize}
+  \item Punto de entrada único: como proxy inverso, centraliza el acceso
+        a todos los servicios del proyecto bajo un único dominio con múltiples
+        subdominios.
+  \item Seguridad: la terminación TLS en Nginx cifra todas las
+        comunicaciones entre los clientes y los servicios internos, incluso
+        cuando los backends no implementan cifrado propio.
+  \item Flexibilidad: los virtual hosts permiten agregar nuevos servicios
+        sin modificar la infraestructura de red ni abrir puertos adicionales
+        en el firewall.
+  \item Presencia institucional: el sitio web estático del proyecto
+        proporciona una interfaz profesional accesible desde cualquier
+        navegador.
+  \item Simplicidad operativa: al concentrar la configuración TLS y el
+        enrutamiento en un solo punto, se simplifica la administración de
+        certificados y la gestión del acceso a los servicios.
+\end{itemize}
+
+\subsection{Aprendizajes adquiridos}
+
+El taller permitió desarrollar competencias prácticas en administración de
+servicios de red:
+
+\begin{itemize}
+  \item Se comprendió el rol del servidor web como proxy inverso y
+        terminador TLS, consolidando el acceso a múltiples servicios bajo una
+        única interfaz HTTPS.
+  \item Se aprendió a configurar virtual hosts en Nginx para servir
+        múltiples subdominios con distintos backends.
+  \item Se implementó la generación automática de certificados SSL
+        auto-firmados, comprendiendo los conceptos de clave pública,
+        \texttt{subjectAltName} y cadenas de confianza.
+  \item Se comprendió la importancia de la resolución dinámica de upstreams
+        en entornos contenerizados, donde las direcciones IP de los servicios
+        pueden cambiar entre reinicios.
+  \item Se aprendió a configurar soporte WebSocket en Nginx para servicios
+        que requieren comunicación bidireccional en tiempo real.
+  \item Se valoró la infraestructura como código: toda la configuración
+        del servidor web quedó definida en archivos versionados,
+        permitiendo su reproducción exacta en cualquier entorno.
+\end{itemize}

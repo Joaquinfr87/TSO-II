@@ -1,0 +1,133 @@
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+{Debian Project}%
+}{%
+{Debian Project}%
+}{%
+{\protect \APACyear {2026}}%
+}]{%
+debianReference}
+\APACinsertmetastar {%
+debianReference}%
+\begin{APACrefauthors}%
+{Debian Project}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2026}{}{}.
+\newblock
+\APACrefbtitle {Debian System and Network Administration Guide.} {Debian system
+  and network administration guide.}
+\newblock
+\APAChowpublished {\url{https://www.debian.org/doc/manuals/debian-reference/}}.
+\newblock
+\APACrefnote{Recurso de referencia para administraci\'on de sistemas Debian y
+  pr\'acticas de configuraci\'on.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Docker, Inc.}%
+}{%
+{Docker, Inc.}%
+}{%
+{\protect \APACyear {2026}}%
+}]{%
+dockerDocs}
+\APACinsertmetastar {%
+dockerDocs}%
+\begin{APACrefauthors}%
+{Docker, Inc.}%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2026}{}{}.
+\newblock
+\APACrefbtitle {Docker Documentation: Networking.} {Docker documentation:
+  Networking.}
+\newblock
+\APAChowpublished {\url{https://docs.docker.com/network/}}.
+\newblock
+\APACrefnote{Documentaci\'on oficial de Docker sobre redes, incluyendo el DNS
+  embebido 127.0.0.11.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Nginx, Inc.}%
+}{%
+{Nginx, Inc.}%
+}{%
+{\protect \APACyear {2026}}%
+}]{%
+nginx2026}
+\APACinsertmetastar {%
+nginx2026}%
+\begin{APACrefauthors}%
+{Nginx, Inc.}%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2026}{}{}.
+\newblock
+\APACrefbtitle {Nginx Documentation.} {Nginx documentation.}
+\newblock
+\APAChowpublished {\url{https://nginx.org/en/docs/}}.
+\newblock
+\APACrefnote{Documentaci\'on oficial del servidor web Nginx, incluyendo
+  configuraci\'on de proxy inverso y TLS.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Stewart%
+\ \BBA {} Chapple%
+}{%
+Stewart%
+\ \BBA {} Chapple%
+}{%
+{\protect \APACyear {2017}}%
+}]{%
+stewart2017}
+\APACinsertmetastar {%
+stewart2017}%
+\begin{APACrefauthors}%
+Stewart, J.%
+\BCBT {}\ \BBA {} Chapple, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYear{2017}.
+\newblock
+\APACrefbtitle {CISSP: Certified Information Systems Security Professional
+  Study Guide} {Cissp: Certified information systems security professional
+  study guide}\ (\PrintOrdinal{7}\ \BEd).
+\newblock
+\APACaddressPublisher{Indianapolis, IN}{Wiley}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Tanenbaum%
+\ \BBA {} Wetherall%
+}{%
+Tanenbaum%
+\ \BBA {} Wetherall%
+}{%
+{\protect \APACyear {2017}}%
+}]{%
+tanenbaum2017}
+\APACinsertmetastar {%
+tanenbaum2017}%
+\begin{APACrefauthors}%
+Tanenbaum, A\BPBI S.%
+\BCBT {}\ \BBA {} Wetherall, D\BPBI J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYear{2017}.
+\newblock
+\APACrefbtitle {Redes de computadoras} {Redes de computadoras}\
+  (\PrintOrdinal{6}\ \BEd).
+\newblock
+\APACaddressPublisher{Madrid}{Pearson}.
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}

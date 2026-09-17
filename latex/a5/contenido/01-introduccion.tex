@@ -1,0 +1,37 @@
+% ============================================================================
+%  CAPÍTULO I: INTRODUCCIÓN
+% ============================================================================
+
+\section{Introducción}
+
+En toda infraestructura de red institucional, el servidor web constituye la
+puerta de entrada a los recursos digitales de una organización. A través de
+los protocolos HTTP y HTTPS, un servidor web atiende las solicitudes de los
+navegadores de los usuarios, devolviendo páginas, archivos y servicios de
+forma segura \cite{tanenbaum2017}.
+
+En entornos empresariales, el servidor web frecuentemente cumple funciones
+adicionales como proxy inverso ---redirigiendo las solicitudes de los
+clientes hacia servicios internos--- y terminador TLS ---cifrando las
+comunicaciones con certificados SSL/TLS \cite{nginx2026}. Esta capacidad
+permite centralizar el acceso a múltiples servicios bajo un único punto de
+entrada, simplificando la administración de la red y mejorando la seguridad
+al cifrar todas las comunicaciones entre los clientes y los servicios.
+
+El presente informe documenta la configuración de un servidor web dentro del
+proyecto integrador del curso de Taller de Sistemas Operativos II,
+desarrollado por el equipo \textit{Grupo 1 Sudoers} en el dominio
+\texttt{sudoers.lan}. Se implementó Nginx, configurado como servidor de
+contenido estático, proxy inverso hacia los servicios internos del proyecto
+(impresión, archivos, monitoreo y gestión Docker) y terminador TLS con
+certificados auto-firmados.
+
+El servicio se despliega sobre un servidor Debian mediante un contenedor
+Docker, integrándose con el servidor DNS (BIND9) del proyecto para la
+resolución de nombres dentro del dominio \texttt{sudoers.lan}.
+
+Este capítulo introduce el contexto general del taller y presenta la
+importancia del servidor web en la administración de sistemas informáticos.
+Los capítulos siguientes desarrollan los objetivos planteados, el alcance y
+los límites del trabajo, el proceso de configuración del servicio y las
+conclusiones obtenidas.

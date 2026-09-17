@@ -1,0 +1,74 @@
+% ============================================================================
+%  CAPÍTULO II: ALCANCE Y LÍMITES
+% ============================================================================
+
+\section{Alcance y Límites}
+
+\subsection{Alcance}
+
+El presente informe documenta la configuración del servidor web del proyecto.
+Las actividades realizadas incluyen:
+
+\begin{itemize}
+  \item Instalación de Nginx 1.27 sobre Alpine Linux mediante contenedor
+        Docker.
+  \item Configuración de virtual hosts para el sitio principal del proyecto
+        (\texttt{web.sudoers.lan}, \texttt{www.sudoers.lan},
+        \texttt{sudoers.lan}).
+  \item Configuración de proxy inverso hacia los servicios internos:
+        \begin{itemize}
+          \item CUPS (impresión): \texttt{print.sudoers.lan}
+          \item Filebrowser (archivos): \texttt{files.sudoers.lan}
+          \item Portainer (gestión Docker): \texttt{portainer.sudoers.lan}
+          \item Zabbix (monitoreo): \texttt{zabbix.sudoers.lan}
+        \end{itemize}
+  \item Generación automática de certificados SSL/TLS auto-firmados mediante
+        el script de entrypoint.
+  \item Configuración de redirección HTTP a HTTPS en todos los virtual hosts.
+  \item Configuración del servidor por defecto (\texttt{default\_server}) para
+        capturar peticiones no mapeadas.
+  \item Configuración de soporte WebSocket para Portainer.
+  \item Despliegue de la landing page del proyecto como contenido estático.
+  \item Pruebas de acceso desde navegadores y verificación de los proxies
+        inversos.
+\end{itemize}
+
+\subsection{Límites}
+
+Los siguientes aspectos no forman parte de este informe:
+
+\begin{itemize}
+  \item Certificados SSL emitidos por una autoridad de certificación (CA)
+        confiable; se utilizan certificados auto-firmados adecuados para
+        un entorno de laboratorio.
+  \item Integración con dominios externos o configuración de registros DNS
+        públicos.
+  \item Balanceo de carga o alta disponibilidad del servidor web.
+  \item Configuración de WAF (\textit{Web Application Firewall}) o reglas
+        avanzadas de seguridad en Nginx.
+  \item Seguridad avanzada como protección contra ataques DDoS, rate limiting
+        o listas de control de acceso por IP.
+\end{itemize}
+
+\subsection{Entorno de trabajo}
+
+El entorno utilizado para la configuración consta de los siguientes
+componentes:
+
+\begin{itemize}
+  \item Servidor: máquina física con Debian 12 (Bookworm) donde se
+        ejecutan todos los servicios del proyecto mediante Docker.
+  \item Despliegue: los servicios se ejecutan en contenedores Docker
+        gestionados con Docker Compose, conectados por la red interna
+        \texttt{tso-net}.
+  \item Red interna: red administrativa \texttt{192.168.0.0/24}
+        (WLO1) y red de usuarios \texttt{192.168.20.0/24} (ENO1).
+  \item Servicio: Nginx 1.27 sobre Alpine Linux.
+  \item Resolución de nombres: servidor DNS propio (BIND9) que resuelve
+        el dominio \texttt{sudoers.lan} para todos los servicios.
+  \item Clientes de prueba: máquinas Linux y Windows conectadas a la
+        red local, navegadores web para verificación de los sitios y
+        proxies inversos.
+  \item Usuarios: \texttt{nicolas}, \texttt{joaquin} y
+        \texttt{david}, integrantes del equipo \textit{Grupo 1 Sudoers}.
+\end{itemize}
