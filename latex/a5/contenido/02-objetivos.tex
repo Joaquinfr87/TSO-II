@@ -3,3 +3,21 @@
 % ============================================================================
 
 \section{Objetivos del trabajo}
+
+\subsection{Objetivos específicos}
+
+\begin{itemize}
+  \item Comprender el funcionamiento del protocolo DHCP, incluido el proceso
+        de negociación \textit{Discover–Offer–Request–Acknowledge} (DORA), la
+        gestión de concesiones (leases) y las opciones que el servidor puede
+        entregar a los clientes \cite{droms1997,rfc2131}.
+  \item Instalar y configurar un servidor DHCP basado en Kea sobre Debian,
+        definiendo la subred \texttt{192.168.0.0/24}, el ámbito de
+        asignación dinámica para los equipos de usuario, las opciones de red
+        (gateway, servidor DNS y dominio) y la desactivación del DHCP del
+        router para evitar conflictos de asignación.
+  \item Verificar la asignación automática de direcciones IP desde equipos
+        clientes de la red, comprobando que cada uno recibe los parámetros de
+        red configurables y que las concesiones quedan registradas en el
+        servidor.
+\end{itemize}

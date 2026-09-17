@@ -3,3 +3,221 @@
 % ============================================================================
 
 \section{Desarrollo del trabajo}
+
+Este capítulo documenta el proceso completo de instalación, configuración y
+prueba del servidor DHCP implementado con Kea sobre el sistema Debian del
+proyecto. Se describe desde la instalación de los paquetes necesarios hasta
+las pruebas de asignación automática de direcciones IP realizadas desde
+equipos clientes.
+
+\section{Servidor DHCP}
+
+El servidor DHCP se implementó utilizando Kea, el servidor DHCP de ISC
+(\textit{Internet Systems Consortium}) y sucesor del clásico
+\texttt{dhcpd}, seleccionado por su soporte activo, su configuración basada
+en JSON y su manejo eficiente de las concesiones \cite{keaDocs}. A
+continuación se describe el proceso de implementación.
+
+% -------------------------------------------------------
+\subsection{Arquitectura del sistema}
+
+El servicio se desplegó de manera centralizada sobre el servidor Debian de la
+red local \texttt{192.168.0.0/24}. Para que el servidor DHCP sea el único que
+otorgue direcciones, se desactivó el servicio DHCP del router de la red,
+evitando así que dos servidores respondan a las peticiones \textsc{Discover}
+de los clientes con ofertas distintas.
+
+La red se dividió en dos segmentos lógicos según la política del proyecto:
+
+\begin{itemize}
+  \item \textbf{Equipos de rol (192.168.0.1--192.168.0.109):} incluye al
+        router, al propio servidor Debian (\texttt{192.168.0.105}) y a todos
+        los servicios (DNS, web, archivos, correo) que requieren una dirección
+        IP fija.
+  \item \textbf{Equipos de usuario (192.168.0.110--192.168.0.254):} rango de
+        direcciones que el servidor DHCP puede entregar dinámicamente a los
+        dispositivos de los usuarios de la red.
+\end{itemize}
+
+El servidor DHCP entrega a cada cliente, junto con la dirección IP, la
+máscara de subred (\texttt{255.255.255.0}), la puerta de enlace
+(\texttt{192.168.0.1}), el servidor DNS del proyecto
+(\texttt{192.168.0.105}) y el dominio de búsqueda (\texttt{sudoers.lan}).
+De esta manera, el cliente queda configurado sin intervención manual y puede
+resolver los nombres de los servicios internos inmediatamente.
+
+La figura \ref{fig:arquitectura-dhcp} presenta la arquitectura del servicio
+implementado.
+
+\figuraAPA{fig:arquitectura-dhcp}{Arquitectura del servicio DHCP: clientes, router y servidor}{%
+  \begin{tikzpicture}[
+      node distance=1.2cm and 1.6cm,
+      ser/.style={draw, rounded corners, minimum width=2.6cm,
+                  minimum height=0.9cm, align=center, font=\small},
+      cli/.style={draw, minimum width=2.4cm, minimum height=0.8cm,
+                  align=center, font=\small},
+      flujo/.style={-Stealth, thick}
+    ]
+    \node[ser] (kea) {Kea DHCP\\192.168.0.105};
+    \node[cli, left=of kea, yshift=0.7cm] (c1) {Usuario 1\\192.168.0.110+};
+    \node[cli, left=of kea, yshift=-0.7cm] (c2) {Usuario 2\\192.168.0.110+};
+    \node[ser, right=of kea] (router) {Router\\192.168.0.1\\(DHCP off)};
+    \node[ser, right=of router] (dns) {DNS\\192.168.0.105};
+
+    \draw[flujo] (c1.east) -- (kea.west);
+    \draw[flujo] (c2.east) -- (kea.west);
+    \draw[flujo] (kea.east) -- (router.west);
+    \draw[flujo, dashed] (dns.west) -- (router.east);
+  \end{tikzpicture}%
+}{Elaboración propia.}
+
+% -------------------------------------------------------
+\subsection{Instalación del servidor DHCP}
+
+El servidor DHCP se instaló sobre el sistema Debian mediante el administrador
+de paquetes APT. Kea se distribuye en paquetes separados por protocolo; para
+este proyecto se requiere únicamente el servicio DHCPv4:
+
+\begin{lstlisting}[style=terminal]
+$ apt update
+$ apt install -y kea-dhcp4-server
+\end{lstlisting}
+
+El paquete \texttt{kea-dhcp4-server} instala el binario
+\texttt{kea-dhcp4}, crea el usuario de sistema \texttt{\_kea} con el que el
+servicio ejecuta y registra la unidad de \texttt{systemd}
+\texttt{kea-dhcp4-server.service}. Después de la instalación, la
+configuración principal queda en \texttt{/etc/kea/kea-dhcp4.conf}.
+
+% -------------------------------------------------------
+\subsection{Configuración del servidor}
+
+La configuración de Kea se define en el archivo
+\texttt{/etc/kea/kea-dhcp4.conf}, con formato JSON. A continuación se
+describen los bloques más relevantes configurados para el proyecto.
+
+\subsubsection{Interfaz y base de datos de concesiones}
+
+Kea escucha en todas las interfaces del servidor para poder atender los
+paquetes \textsc{Discover} que llegan por broadcast desde la LAN. Las
+concesiones se almacenan en el archivo
+\texttt{/var/lib/kea/kea-leases4.csv}:
+
+\begin{lstlisting}[style=terminal]
+"interfaces-config": { "interfaces": ["*"] },
+"lease-database": { "type": "memfile", "lfc-interval": 3600 }
+\end{lstlisting}
+
+La opción \texttt{lfc-interval} indica cada cuántos segundos se compacta el
+archivo de concesiones para mantenerlo eficiente.
+
+\subsubsection{Subred, ámbito y opciones}
+
+Se definió la subred \texttt{192.168.0.0/24} con un único ámbito de
+asignación dinámica comprendido entre \texttt{192.168.0.110} y
+\texttt{192.168.0.254}:
+
+\begin{lstlisting}[style=terminal]
+"subnet4": [{
+  "subnet": "192.168.0.0/24",
+  "pools": [{ "pool": "192.168.0.110 - 192.168.0.254" }],
+  "option-data": [
+    { "name": "domain-name-servers", "data": "192.168.0.105" },
+    { "name": "domain-name", "data": "sudoers.lan" },
+    { "name": "routers", "data": "192.168.0.1" }
+  ]
+}]
+\end{lstlisting}
+
+La separación del rango es intencional: los equipos de rol usan direcciones
+inferiores a \texttt{192.168.0.110} (fijas o configuradas fuera del ámbito),
+mientras que el ámbito dinámico atiende exclusivamente a los equipos de
+usuario. Además, cada cliente recibe automáticamente el servidor DNS del
+proyecto (\texttt{192.168.0.105}), el dominio \texttt{sudoers.lan} y la
+puerta de enlace \texttt{192.168.0.1}.
+
+% -------------------------------------------------------
+\subsection{Desactivación del DHCP del router}
+
+El router de la red contaba con su propio servicio DHCP activo, lo que
+provocaría un conflicto: tanto el router como Kea responderían a los
+paquetes \textsc{Discover} y los clientes podrían recibir configuraciones
+distintas e inconsistentes. Para garantizar que el único servidor DHCP de la
+red sea el implementado en el proyecto, se accedió a la interfaz de
+administración del router y se deshabilitó el servicio DHCP en la LAN
+(DHCP Server - Off), manteniendo únicamente la configuración de la puerta de
+enlace y las reglas de red existentes.
+
+Al realizar esta desactivación, los clientes conectados a la red que tuvieran
+una IP asignada previamente por el router dependen de renovar su concesión;
+una vez que lo hacen, el servidor Kea les asigna una dirección dentro del
+ámbito dinámico junto con la configuración de red completa.
+
+% -------------------------------------------------------
+\subsection{Verificación del servicio}
+
+Antes de probar con clientes reales se validó la configuración y el estado
+del servicio. La sintaxis del archivo de configuración se comprobó con la
+opción de prueba de Kea:
+
+\begin{lstlisting}[style=terminal]
+$ kea-dhcp4 -t /etc/kea/kea-dhcp4.conf
+$ systemctl restart kea-dhcp4-server
+$ systemctl status kea-dhcp4-server
+\end{lstlisting}
+
+El comando \texttt{kea-dhcp4 -t} devuelve \texttt{Configuration check
+successful} si el archivo es válido. Posteriormente se reinició el servicio y
+se confirmó su estado activo (\texttt{active (running)}) mediante
+\texttt{systemctl}. La figura \ref{fig:captura-estado} muestra el estado del
+servicio en ejecución.
+
+\capturaAPA{fig:captura-estado}{Salida de \texttt{systemctl status kea-dhcp4-server} en el servidor}{captura-systemctl-kea.png}{Captura de pantalla de la terminal mostrando el estado activo del servicio \texttt{kea-dhcp4-server} con la ruta de la configuración cargada.}
+
+% -------------------------------------------------------
+\subsection{Pruebas de asignación desde clientes}
+
+Para comprobar la asignación automática se utilizó un equipo cliente conectado
+a la misma red física. Se ejecutó el cliente DHCP del sistema con
+\texttt{dhclient} y se verificó la configuración recibida con \texttt{ip a}:
+
+\begin{lstlisting}[style=terminal]
+$ sudo dhclient -v eth0
+$ ip a
+$ ip route
+$ resolvectl status
+\end{lstlisting}
+
+El cliente recibió una dirección IP dentro del ámbito dinámico
+(\texttt{192.168.0.110}--\texttt{192.168.0.254}), junto con la máscara, la
+puerta de enlace y el servidor DNS entregados por Kea. La figura
+\ref{fig:captura-cliente} evidencia la asignación en el equipo cliente.
+
+\capturaAPA{fig:captura-cliente}{Dirección IP asignada al cliente con \texttt{ip a} tras el arranque de \texttt{dhclient}}{captura-cliente-ip.png}{Captura de pantalla de la salida de \texttt{ip a} en el cliente mostrando la dirección IP, la máscara \texttt{/24} y el estado de la interfaz (UP).}
+
+% -------------------------------------------------------
+\subsection{Registro de concesiones}
+
+Cada asignación queda registrada en el archivo de concesiones de Kea. Su
+contenido se puede consultar directamente desde el servidor:
+
+\begin{lstlisting}[style=terminal]
+$ cat /var/lib/kea/kea-leases4.csv
+\end{lstlisting}
+
+La figura \ref{fig:captura-leases} muestra las concesiones otorgadas por el
+servidor, identificando la dirección IP entregada, la dirección MAC del
+cliente y el tiempo de validez de cada lease, lo que confirma que la
+asignación dinámica funciona correctamente.
+
+\capturaAPA{fig:captura-leases}{Concesiones registradas por Kea en \texttt{/var/lib/kea/kea-leases4.csv}}{captura-leases.png}{Captura de pantalla del archivo \texttt{kea-leases4.csv} mostrando las concesiones activas: dirección IP, hardware address del cliente, hostname y tiempos de renovación/expiracion.}
+
+Finalmente, la conectividad del cliente se validó con \texttt{ping} hacia la
+puerta de enlace y hacia el servidor DNS, comprobando que la configuración
+entregada por DHCP permite al equipo alcanzar los servicios internos de la
+red:
+
+\begin{lstlisting}[style=terminal]
+$ ping -c 2 192.168.0.1
+$ ping -c 2 192.168.0.105
+\end{lstlisting}
