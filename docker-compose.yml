@@ -46,9 +46,9 @@ services:
   dhcp:
     build: ./services/dhcp
     container_name: tso-dhcp
-    # 67/udp: descubrimiento y oferta DHCP
-    ports:
-      - "67:67/udp"
+    # Kea necesita escuchar broadcasts de la LAN física
+    # network_mode: host lo conecta directo a las interfaces del servidor
+    network_mode: host
     environment:
       DHCP_SUBNET: ${DHCP_SUBNET:-192.168.1.0/24}
       DHCP_POOL: ${DHCP_POOL:-192.168.1.100 - 192.168.1.200}
@@ -57,8 +57,6 @@ services:
       HOST_IP: ${HOST_IP:-192.168.1.10}
     volumes:
       - dhcp_state:/var/lib/kea
-    networks:
-      - tso-net
 
   # ------------------------------------------------------------------
   # Base de datos (PostgreSQL) — Nicolás
