@@ -1,0 +1,210 @@
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+{Debian Project}%
+}{%
+{Debian Project}%
+}{%
+{\protect \APACyear {2026}}%
+}]{%
+debianReference}
+\APACinsertmetastar {%
+debianReference}%
+\begin{APACrefauthors}%
+{Debian Project}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2026}{}{}.
+\newblock
+\APACrefbtitle {Debian System and Network Administration Guide.} {Debian system
+  and network administration guide.}
+\newblock
+\APAChowpublished {\url{https://www.debian.org/doc/manuals/debian-reference/}}.
+\newblock
+\APACrefnote{Recurso de referencia para administraci\'on de sistemas Debian y
+  pr\'acticas de configuraci\'on.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Droms%
+}{%
+Droms%
+}{%
+{\protect \APACyear {1997}}%
+{\protect \APACexlab {{\protect \BCnt {1}}}}}]{%
+rfc2131}
+\APACinsertmetastar {%
+rfc2131}%
+\begin{APACrefauthors}%
+Droms, R.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1997{\protect \BCnt {1}}}{{\APACmonth{03}}}{}.
+\newblock
+\APACrefbtitle {Dynamic Host Configuration Protocol} {Dynamic host
+  configuration protocol}\ \APACbVolEdTR{}{\BTR{}\ \BNUM\ RFC 2131}.
+\newblock
+\APACaddressInstitution{}{Network Working Group}.
+\newblock
+\begin{APACrefDOI} \doi{10.17487/RFC2131} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Droms%
+}{%
+Droms%
+}{%
+{\protect \APACyear {1997}}%
+{\protect \APACexlab {{\protect \BCnt {2}}}}}]{%
+droms1997}
+\APACinsertmetastar {%
+droms1997}%
+\begin{APACrefauthors}%
+Droms, R.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1997{\protect \BCnt {2}}}{}{}.
+\newblock
+\APACrefbtitle {RFC 2132: DHCP Options and BOOTP Vendor Extensions.} {Rfc 2132:
+  Dhcp options and bootp vendor extensions.}
+\newblock
+\APAChowpublished {\url{https://datatracker.ietf.org/doc/html/rfc2132}}.
+\newblock
+\APACrefnote{Definici\'on de las opciones que el protocolo DHCP puede entregar
+  a los clientes.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Internet Systems Consortium}%
+}{%
+{Internet Systems Consortium}%
+}{%
+{\protect \APACyear {2026}}%
+}]{%
+keaDocs}
+\APACinsertmetastar {%
+keaDocs}%
+\begin{APACrefauthors}%
+{Internet Systems Consortium}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2026}{}{}.
+\newblock
+\APACrefbtitle {Kea DHCP Server Documentation.} {Kea dhcp server
+  documentation.}
+\newblock
+\APAChowpublished {\url{https://kea.readthedocs.io/}}.
+\newblock
+\APACrefnote{Documentaci\'on oficial del servidor DHCP Kea: instalaci\'on,
+  configuraci\'on y par\'ametros del archivo \texttt{kea-dhcp4.conf}.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Nginx, Inc.}%
+}{%
+{Nginx, Inc.}%
+}{%
+{\protect \APACyear {2026}}%
+}]{%
+nginx2026}
+\APACinsertmetastar {%
+nginx2026}%
+\begin{APACrefauthors}%
+{Nginx, Inc.}%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2026}{}{}.
+\newblock
+\APACrefbtitle {Nginx Documentation.} {Nginx documentation.}
+\newblock
+\APAChowpublished {\url{https://nginx.org/en/docs/}}.
+\newblock
+\APACrefnote{Documentaci\'on oficial del servidor web Nginx, incluyendo
+  configuraci\'on de proxy inverso y TLS.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{OpenSSL Project}%
+}{%
+{OpenSSL Project}%
+}{%
+{\protect \APACyear {2026}}%
+}]{%
+opensslDocs}
+\APACinsertmetastar {%
+opensslDocs}%
+\begin{APACrefauthors}%
+{OpenSSL Project}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2026}{}{}.
+\newblock
+\APACrefbtitle {OpenSSL Documentation and Cryptography Tools.} {Openssl
+  documentation and cryptography tools.}
+\newblock
+\APAChowpublished {\url{https://www.openssl.org/docs/}}.
+\newblock
+\APACrefnote{Documentaci\'on oficial para generaci\'on de certificados X.509,
+  gesti\'on de claves y par\'ametros TLS.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Stewart%
+\ \BBA {} Chapple%
+}{%
+Stewart%
+\ \BBA {} Chapple%
+}{%
+{\protect \APACyear {2017}}%
+}]{%
+stewart2017}
+\APACinsertmetastar {%
+stewart2017}%
+\begin{APACrefauthors}%
+Stewart, J.%
+\BCBT {}\ \BBA {} Chapple, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYear{2017}.
+\newblock
+\APACrefbtitle {CISSP: Certified Information Systems Security Professional
+  Study Guide} {Cissp: Certified information systems security professional
+  study guide}\ (\PrintOrdinal{7}\ \BEd).
+\newblock
+\APACaddressPublisher{Indianapolis, IN}{Wiley}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Tanenbaum%
+\ \BBA {} Wetherall%
+}{%
+Tanenbaum%
+\ \BBA {} Wetherall%
+}{%
+{\protect \APACyear {2017}}%
+}]{%
+tanenbaum2017}
+\APACinsertmetastar {%
+tanenbaum2017}%
+\begin{APACrefauthors}%
+Tanenbaum, A\BPBI S.%
+\BCBT {}\ \BBA {} Wetherall, D\BPBI J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYear{2017}.
+\newblock
+\APACrefbtitle {Redes de computadoras} {Redes de computadoras}\
+  (\PrintOrdinal{6}\ \BEd).
+\newblock
+\APACaddressPublisher{Madrid}{Pearson}.
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}

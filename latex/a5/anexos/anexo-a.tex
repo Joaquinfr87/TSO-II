@@ -1,0 +1,31 @@
+% ============================================================================
+%  ANEXO A: Archivos de configuración del Servidor Web
+% ============================================================================
+
+% Este anexo se puede habilitar descomentando las líneas correspondientes
+% en main.tex si se desea incluir material complementario.
+
+\section*{Anexo A: Archivos de configuración}
+
+A continuación se detallan las referencias a los archivos de configuración
+utilizados para el despliegue del servidor web sobre Debian GNU/Linux 12:
+
+\subsection*{A.1. Directivas globales de TLS y WebSocket}
+
+Ubicadas en \texttt{/etc/nginx/nginx.conf} o en \texttt{/etc/nginx/conf.d/},
+incluyen los parámetros de versiones de protocolo (TLS 1.2 y 1.3), gestión de
+sesiones compartidas y el bloque \texttt{map} para la conmutación dinámica de
+cabeceras WebSocket.
+
+\subsection*{A.2. Configuración de Virtual Hosts y Proxies Inversos}
+
+Definida en \texttt{/etc/nginx/sites-available/sudoers.conf} (activada mediante
+enlace simbólico en \texttt{/etc/nginx/sites-enabled/}), que contiene todos los
+bloques \texttt{server} para la redirección HTTP hacia HTTPS, el sitio principal
+y los proxies hacia CUPS, Filebrowser, Portainer y Zabbix.
+
+\subsection*{A.3. Certificados digitales SSL/TLS}
+
+Generados mediante OpenSSL en \texttt{/etc/ssl/certs/web.pem} y
+\texttt{/etc/ssl/private/web.key}, con permisos restrictivos y extensión
+\textit{Subject Alternative Name} (SAN) para el dominio y sus subdominios.

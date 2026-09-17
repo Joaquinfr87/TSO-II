@@ -3,3 +3,47 @@
 % ============================================================================
 
 \section{Introducción}
+
+En toda infraestructura de red institucional, el servidor web constituye la
+puerta de entrada a los recursos digitales de una organización. A través de
+los protocolos HTTP y HTTPS, un servidor web atiende las solicitudes de los
+navegadores de los usuarios, devolviendo páginas, archivos y servicios de
+forma segura \cite{tanenbaum2017}.
+
+En entornos empresariales, el servidor web frecuentemente cumple funciones
+adicionales como proxy inverso ---redirigiendo las solicitudes de los
+clientes hacia servicios internos--- y terminador TLS ---cifrando las
+comunicaciones con certificados SSL/TLS \cite{nginx2026}. Esta capacidad
+permite centralizar el acceso a múltiples servicios bajo un único punto de
+entrada, simplificando la administración de la red y mejorando la seguridad
+al cifrar todas las comunicaciones entre los clientes y los servicios.
+
+De manera complementaria, el protocolo DHCP (\textit{Dynamic Host
+Configuration Protocol}) permite asignar automáticamente los parámetros de
+configuración de red a los equipos de usuario ---dirección IP, máscara de
+subred, puerta de enlace y servidores DNS---, evitando la configuración
+manual de cada dispositivo y garantizando la coherencia de los parámetros de
+red \cite{rfc2131}.
+
+El presente informe documenta la configuración de un servidor web y de un
+servidor DHCP dentro del proyecto integrador del curso de Taller de Sistemas
+Operativos II, desarrollado por el equipo \textit{Grupo 1 Sudoers} en el
+dominio \texttt{sudoers.lan}. Por un lado, se implementó Nginx, configurado
+como servidor de contenido estático, proxy inverso hacia los servicios
+internos del proyecto (servidor de impresión CUPS, servidor de archivos web,
+plataforma de gestión Portainer y sistema de monitoreo Zabbix) y terminador
+TLS con certificados auto-firmados. Por otro lado, se implementó el servidor
+DHCP Kea para la asignación dinámica de direcciones IP dentro del segmento
+de usuarios de la red \texttt{192.168.0.0/24}, reemplazando al servicio DHCP
+del router.
+
+Los servicios se despliegan de manera nativa sobre un servidor Debian GNU/Linux
+12 (Bookworm) mediante el gestor de paquetes APT y administrados por
+\texttt{systemd}, integrándose con el servidor DNS (BIND9) del proyecto para la
+resolución de nombres dentro del dominio \texttt{sudoers.lan}.
+
+Este capítulo introduce el contexto general del taller y presenta la
+importancia de los servicios web y DHCP en la administración de sistemas
+informáticos. Los capítulos siguientes desarrollan los objetivos planteados,
+el alcance y los límites del trabajo, el proceso de configuración de los
+servicios y las conclusiones obtenidas.

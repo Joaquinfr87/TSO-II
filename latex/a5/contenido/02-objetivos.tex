@@ -4,6 +4,13 @@
 
 \section{Objetivos del trabajo}
 
+\subsection{Objetivo general}
+
+Comprender el funcionamiento y la configuración de un servidor web (Nginx) y
+de un servidor DHCP (Kea), así como su integración con los servicios de
+resolución de nombres (DNS) y los demás servicios de la infraestructura de
+red del proyecto \texttt{sudoers.lan}, en un entorno administrado con Debian.
+
 \subsection{Objetivos específicos}
 
 \begin{itemize}
@@ -20,4 +27,20 @@
         clientes de la red, comprobando que cada uno recibe los parámetros de
         red configurables y que las concesiones quedan registradas en el
         servidor.
+  \item Instalar y configurar de forma nativa el servidor web Nginx sobre
+        Debian para alojar el sitio institucional del proyecto y servir como
+        proxy inverso hacia los servicios internos.
+  \item Implementar HTTPS con certificados SSL/TLS auto-firmados para la
+        protección de las comunicaciones web.
+  \item Configurar virtual hosts para múltiples subdominios del proyecto
+        (\texttt{web.sudoers.lan}, \texttt{print.sudoers.lan},
+        \texttt{files.sudoers.lan}, \texttt{portainer.sudoers.lan},
+        \texttt{zabbix.sudoers.lan}).
+  \item Configurar proxies inversos hacia los servicios internos del proyecto
+        (CUPS, Filebrowser, Portainer y Zabbix) con soporte para WebSocket.
+  \item Realizar pruebas de acceso web desde navegadores y verificación de
+        los proxies inversos.
+  \item Documentar el proceso completo de instalación, configuración y prueba
+        de los servicios, incluyendo comandos, archivos de configuración y
+        evidencias de cada paso.
 \end{itemize}

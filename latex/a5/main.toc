@@ -1,0 +1,49 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {part}{CAP\'ITULO I\\INTRODUCCI\'ON}{1}{\spacefactor \@m {}currentHref}
+\contentsline {section}{\numberline {1.1}Introducción}{1}{section.1.1}%
+\contentsline {part}{CAP\'ITULO II\\OBJETIVOS, ALCANCE Y L\'IMITES}{3}{\spacefactor \@m {}currentHref}
+\contentsline {section}{\numberline {2.1}Objetivos del trabajo}{3}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Objetivo general}{3}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Objetivos específicos}{3}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Alcance y Límites}{4}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Alcance}{4}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Límites}{5}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Entorno de trabajo}{6}{subsection.2.2.3}%
+\contentsline {part}{CAP\'ITULO III\\DESARROLLO DEL TRABAJO}{7}{\spacefactor \@m {}currentHref}
+\contentsline {section}{\numberline {3.1}Desarrollo del trabajo}{7}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Servidor DHCP}{7}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Arquitectura del sistema}{7}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Instalación del servidor DHCP}{8}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Configuración del servidor}{8}{subsection.3.2.3}%
+\contentsline {subsubsection}{\numberline {3.2.3.1}Interfaz y base de datos de concesiones}{9}{subsubsection.3.2.3.1}%
+\contentsline {subsubsection}{\numberline {3.2.3.2}Subred, ámbito y opciones}{9}{subsubsection.3.2.3.2}%
+\contentsline {subsection}{\numberline {3.2.4}Desactivación del DHCP del router}{10}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}Verificación del servicio}{10}{subsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.2.6}Pruebas de asignación desde clientes}{11}{subsection.3.2.6}%
+\contentsline {subsection}{\numberline {3.2.7}Registro de concesiones}{12}{subsection.3.2.7}%
+\contentsline {section}{\numberline {3.3}Servidor Web}{13}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Arquitectura del servicio}{13}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Instalación de paquetes en Debian}{14}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Generación del certificado SSL/TLS con OpenSSL}{16}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Configuración TLS global y parámetros de sesión}{17}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.5}Soporte WebSocket para aplicaciones web interactivas}{18}{subsection.3.3.5}%
+\contentsline {subsection}{\numberline {3.3.6}Configuración de Virtual Hosts y Proxies Inversos}{19}{subsection.3.3.6}%
+\contentsline {subsubsection}{\numberline {3.3.6.1}Proxy inverso para CUPS (Servidor de Impresión)}{19}{subsubsection.3.3.6.1}%
+\contentsline {subsubsection}{\numberline {3.3.6.2}Proxy inverso para Filebrowser (Servidor de Archivos Web)}{20}{subsubsection.3.3.6.2}%
+\contentsline {subsubsection}{\numberline {3.3.6.3}Proxy inverso para Portainer (Panel de Administración)}{21}{subsubsection.3.3.6.3}%
+\contentsline {subsubsection}{\numberline {3.3.6.4}Proxy inverso para Zabbix (Monitoreo de Infraestructura)}{22}{subsubsection.3.3.6.4}%
+\contentsline {subsubsection}{\numberline {3.3.6.5}Cabeceras HTTP de proxy compartidas}{23}{subsubsection.3.3.6.5}%
+\contentsline {subsection}{\numberline {3.3.7}Virtual host del sitio principal y servidor por defecto}{23}{subsection.3.3.7}%
+\contentsline {subsection}{\numberline {3.3.8}Gestión del servicio con systemd y control de firewall}{25}{subsection.3.3.8}%
+\contentsline {subsection}{\numberline {3.3.9}Pruebas de acceso y verificación}{26}{subsection.3.3.9}%
+\contentsline {subsubsection}{\numberline {3.3.9.1}Verificación del arranque y puertos del servicio}{26}{subsubsection.3.3.9.1}%
+\contentsline {subsubsection}{\numberline {3.3.9.2}Prueba del sitio institucional principal}{27}{subsubsection.3.3.9.2}%
+\contentsline {subsubsection}{\numberline {3.3.9.3}Prueba de los proxies inversos}{28}{subsubsection.3.3.9.3}%
+\contentsline {subsubsection}{\numberline {3.3.9.4}Verificación del certificado SSL/TLS}{29}{subsubsection.3.3.9.4}%
+\contentsline {part}{CONCLUSIONES}{31}{figure.9}%
+\contentsline {section}{\numberline {4.}Conclusiones}{31}{section.4.}%
+\contentsline {subsection}{\numberline {4.1}Resultados obtenidos}{31}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Dificultades encontradas}{32}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Importancia de los servicios en la administración de redes}{33}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Aprendizajes adquiridos}{34}{subsection.4.4}%
+\contentsline {part}{REFERENCIAS}{35}{subsection.4.4}%

@@ -3,3 +3,89 @@
 % ============================================================================
 
 \section{Alcance y Límites}
+
+\subsection{Alcance}
+
+El presente informe documenta la configuración de los servicios DHCP y web
+del proyecto. Las actividades realizadas incluyen:
+
+\begin{itemize}
+  \item Instalación y configuración del servidor DHCP Kea sobre Debian, con
+        definición de la subred \texttt{192.168.0.0/24}, el ámbito de
+        asignación dinámica para los equipos de usuario
+        (\texttt{192.168.0.110}--\texttt{192.168.0.254}) y las opciones de
+        red entregadas a los clientes (gateway, servidor DNS y dominio).
+  \item Desactivación del servicio DHCP del router de la red para evitar
+        conflictos de asignación entre servidores.
+  \item Verificación de la asignación automática de direcciones IP desde
+        equipos clientes y del registro de concesiones en el servidor.
+  \item Instalación y configuración nativa de Nginx sobre Debian GNU/Linux
+        mediante el gestor de paquetes APT.
+  \item Configuración de virtual hosts para el sitio principal del proyecto
+        (\texttt{web.sudoers.lan}, \texttt{www.sudoers.lan},
+        \texttt{sudoers.lan}).
+  \item Configuración de proxy inverso hacia los servicios internos:
+        \begin{itemize}
+          \item CUPS (impresión): \texttt{print.sudoers.lan}
+          \item Filebrowser (archivos): \texttt{files.sudoers.lan}
+          \item Portainer (panel de administración): \texttt{portainer.sudoers.lan}
+          \item Zabbix (monitoreo): \texttt{zabbix.sudoers.lan}
+        \end{itemize}
+  \item Generación de certificados SSL/TLS auto-firmados mediante la herramienta
+        OpenSSL con directivas SAN (\textit{Subject Alternative Name}).
+  \item Configuración de redirección HTTP a HTTPS en todos los virtual hosts.
+  \item Configuración del servidor por defecto (\texttt{default\_server}) para
+        capturar peticiones no mapeadas.
+  \item Configuración de soporte WebSocket para Portainer.
+  \item Despliegue de la landing page institucional como contenido estático en
+        \texttt{/var/www/html}.
+  \item Habilitación y control de los demonios Nginx y Kea a través del
+        sistema de inicio \texttt{systemd}.
+  \item Pruebas de acceso desde navegadores, verificación de los proxies
+        inversos y comprobación de la asignación DHCP desde clientes.
+\end{itemize}
+
+\subsection{Límites}
+
+Los siguientes aspectos no forman parte de este informe:
+
+\begin{itemize}
+  \item Certificados SSL emitidos por una autoridad de certificación (CA)
+        confiable; se utilizan certificados auto-firmados adecuados para
+        un entorno de laboratorio.
+  \item Integración con dominios externos o configuración de registros DNS
+        públicos.
+  \item Balanceo de carga o alta disponibilidad del servidor web o del
+        servidor DHCP.
+  \item Configuración de WAF (\textit{Web Application Firewall}) o reglas
+        avanzadas de seguridad en Nginx.
+  \item Seguridad avanzada como protección contra ataques DDoS, rate limiting
+        o listas de control de acceso por IP.
+  \item Configuración de servidores DHCP redundantes (\textit{failover}) o
+        sincronización de concesiones entre múltiples nodos.
+  \item DHCPv6 y la gestión de rangos de direcciones IPv6.
+  \item Reservas estáticas de direcciones por MAC en el servidor DHCP.
+\end{itemize}
+
+\subsection{Entorno de trabajo}
+
+El entorno utilizado para la configuración consta de los siguientes
+componentes:
+
+\begin{itemize}
+  \item Servidor: máquina física con Debian GNU/Linux 12 (Bookworm) donde se
+        instalan y configuran los servicios de forma nativa.
+  \item Despliegue: administración directa mediante paquetes oficiales de
+        Debian y orquestación de servicios a través de \texttt{systemd}.
+  \item Red interna: red administrativa \texttt{192.168.0.0/24}
+        (WLO1) y red de usuarios \texttt{192.168.20.0/24} (ENO1).
+  \item Servicios: Nginx (Web), Kea DHCP (Debian GNU/Linux 12 Bookworm).
+  \item Resolución de nombres: servidor DNS propio (BIND9) que resuelve
+        el dominio \texttt{sudoers.lan} para todos los servicios.
+  \item Clientes de prueba: máquinas Linux y Windows conectadas a la
+        red local, navegadores web para verificación de los sitios y
+        proxies inversos, y clientes DHCP para la comprobación de la
+        asignación automática de direcciones.
+  \item Usuarios: \texttt{nicolas}, \texttt{joaquin} y
+        \texttt{david}, integrantes del equipo \textit{Grupo 1 Sudoers}.
+\end{itemize}

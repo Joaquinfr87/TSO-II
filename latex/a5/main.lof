@@ -1,0 +1,10 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces Arquitectura del servicio DHCP: clientes, router y servidor}}{8}{figure.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Salida de \texttt {systemctl status kea-dhcp4-server} en el servidor}}{10}{figure.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Dirección IP asignada al cliente con \texttt {ip a} tras el arranque de \texttt {dhclient}}}{11}{figure.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Concesiones registradas por Kea en \texttt {/var/lib/kea/kea-leases4.csv}}}{12}{figure.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Arquitectura del servidor web: Nginx como proxy inverso y servidor de contenido en Debian}}{13}{figure.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Estado activo del servicio Nginx en Debian}}{27}{figure.6}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Sitio web del proyecto accedido desde un navegador}}{28}{figure.7}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Acceso a servicios internos a través del proxy inverso}}{29}{figure.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Verificación del certificado SSL del servidor web}}{29}{figure.9}%
