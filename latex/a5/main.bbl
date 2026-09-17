@@ -27,32 +27,6 @@ debianReference}%
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
-{Docker, Inc.}%
-}{%
-{Docker, Inc.}%
-}{%
-{\protect \APACyear {2026}}%
-}]{%
-dockerDocs}
-\APACinsertmetastar {%
-dockerDocs}%
-\begin{APACrefauthors}%
-{Docker, Inc.}%
-\end{APACrefauthors}%
-\unskip\
-\newblock
-\APACrefYearMonthDay{2026}{}{}.
-\newblock
-\APACrefbtitle {Docker Documentation: Networking.} {Docker documentation:
-  Networking.}
-\newblock
-\APAChowpublished {\url{https://docs.docker.com/network/}}.
-\newblock
-\APACrefnote{Documentaci\'on oficial de Docker sobre redes, incluyendo el DNS
-  embebido 127.0.0.11.}
-\PrintBackRefs{\CurrentBib}
-
-\bibitem [\protect \citeauthoryear {%
 {Nginx, Inc.}%
 }{%
 {Nginx, Inc.}%
@@ -75,6 +49,32 @@ nginx2026}%
 \newblock
 \APACrefnote{Documentaci\'on oficial del servidor web Nginx, incluyendo
   configuraci\'on de proxy inverso y TLS.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{OpenSSL Project}%
+}{%
+{OpenSSL Project}%
+}{%
+{\protect \APACyear {2026}}%
+}]{%
+opensslDocs}
+\APACinsertmetastar {%
+opensslDocs}%
+\begin{APACrefauthors}%
+{OpenSSL Project}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2026}{}{}.
+\newblock
+\APACrefbtitle {OpenSSL Documentation and Cryptography Tools.} {Openssl
+  documentation and cryptography tools.}
+\newblock
+\APAChowpublished {\url{https://www.openssl.org/docs/}}.
+\newblock
+\APACrefnote{Documentaci\'on oficial para generaci\'on de certificados X.509,
+  gesti\'on de claves y par\'ametros TLS.}
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%

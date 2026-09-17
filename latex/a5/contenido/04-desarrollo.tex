@@ -4,24 +4,32 @@
 
 \section{Desarrollo del trabajo}
 
-Este capítulo documenta el proceso de configuración del servidor web del
-proyecto sobre Debian. Se describe desde la instalación del servicio hasta
-las pruebas de acceso realizadas desde los clientes.
+Este capítulo documenta el proceso de instalación, configuración y verificación
+del servidor web del proyecto sobre el sistema operativo Debian GNU/Linux 12
+(Bookworm). Se detalla desde la instalación de los paquetes mediante APT hasta
+la puesta en marcha del demonio con \texttt{systemd}, la configuración de virtual
+hosts, la terminación TLS y las pruebas de conectividad y acceso desde los
+clientes de la red.
 
 % -------------------------------------------------------
 \subsection{Arquitectura del servicio}
 
-El servidor web se implementó utilizando Nginx 1.27 sobre Alpine Linux,
-desplegado como un contenedor Docker. Nginx cumple un doble rol en el
-proyecto: sirve el sitio web estático del equipo y actúa como proxy inverso
-hacia los servicios internos de la infraestructura, todo protegido con HTTPS
-mediante certificados auto-firmados.
+El servidor web se implementó utilizando Nginx instalado de manera nativa sobre
+Debian. Nginx cumple un doble rol estratégico en la infraestructura de la
+organización: en primer término, aloja el sitio web institucional estático del
+equipo sirviendo páginas HTML5, estilos y recursos gráficos; en segundo
+término, actúa como proxy inverso centralizado hacia los diversos servicios
+internos que operan en la red local o en puertos internos del sistema (servidor
+de impresión CUPS, servicio web de archivos Filebrowser, panel de administración
+Portainer y panel de monitoreo Zabbix).
 
-El servidor opera como punto de entrada único para el acceso HTTP/HTTPS
-de todos los servicios del proyecto. La figura \ref{fig:arquitectura-web}
-presenta la arquitectura general.
+Todo el tráfico web entrante se encuentra protegido mediante el protocolo HTTPS
+a través de certificados TLS auto-firmados con soporte para nombres alternativos
+(\textit{Subject Alternative Name}, SAN) en formato comodín (\textit{wildcard}).
+La figura \ref{fig:arquitectura-web} ilustra la arquitectura general del servidor
+web implementado.
 
-\figuraAPA{fig:arquitectura-web}{Arquitectura del servidor web: Nginx como proxy inverso y servidor de contenido}{%
+\figuraAPA{fig:arquitectura-web}{Arquitectura del servidor web: Nginx como proxy inverso y servidor de contenido en Debian}{%
   \begin{tikzpicture}[
       node distance=1cm and 1.6cm,
       servicio/.style={draw, rounded corners, minimum width=2.4cm,
@@ -34,12 +42,12 @@ presenta la arquitectura general.
 
     % Backends
     \node[servicio, right=2.2cm of nginx, yshift=2cm] (cups) {CUPS\\{\footnotesize :631}};
-    \node[servicio, right=2.2cm of nginx, yshift=0.7cm] (files) {Filebrowser\\{\footnotesize :80}};
+    \node[servicio, right=2.2cm of nginx, yshift=0.7cm] (files) {Filebrowser\\{\footnotesize :8082}};
     \node[servicio, right=2.2cm of nginx, yshift=-0.7cm] (portainer) {Portainer\\{\footnotesize :9000}};
     \node[servicio, right=2.2cm of nginx, yshift=-2cm] (zabbix) {Zabbix Web\\{\footnotesize :8080}};
 
     % Contenido estático
-    \node[servicio, below=of nginx] (html) {/usr/share/\\nginx/html};
+    \node[servicio, below=of nginx] (html) {/var/www/\\html};
 
     % Clientes
     \node[cliente, left=of nginx] (browser) {Web};
@@ -54,8 +62,9 @@ presenta la arquitectura general.
   \end{tikzpicture}%
 }{Elaboración propia.}
 
-La tabla \ref{tab:virtual-hosts} resume los virtual hosts configurados y sus
-destinos.
+La tabla \ref{tab:virtual-hosts} resume los virtual hosts configurados en Nginx,
+sus nombres de dominio asociados, sus destinos y la función que cumplen en la
+infraestructura.
 
 \begin{table}[H]
 \centering
@@ -67,14 +76,14 @@ destinos.
     \toprule
     \textbf{Subdominio} & \textbf{Destino} & \textbf{Función} \\
     \midrule
-    \texttt{print.sudoers.lan} & \texttt{tso-print:631} & Proxy inverso a CUPS (impresión) \\
-    \texttt{files.sudoers.lan} & \texttt{tso-files:80} & Proxy inverso a Filebrowser \\
-    \texttt{portainer.sudoers.lan} & \texttt{tso-portainer:9000} & Proxy inverso a Portainer (WebSocket) \\
-    \texttt{zabbix.sudoers.lan} & \texttt{tso-zabbix-web:8080} & Proxy inverso a Zabbix \\
-    \texttt{web.sudoers.lan} & Contenido estático & Sitio principal del proyecto \\
-    \texttt{www.sudoers.lan} & Contenido estático & Alias del sitio principal \\
-    \texttt{sudoers.lan} & Contenido estático & Alias del sitio principal \\
-    \texttt{\_} (default) & Contenido estático & Acceso por IP o dominios no declarados \\
+    \texttt{print.sudoers.lan} & \texttt{http://127.0.0.1:631} & Proxy inverso a CUPS (impresión) \\
+    \texttt{files.sudoers.lan} & \texttt{http://127.0.0.1:8082} & Proxy inverso a Filebrowser (archivos) \\
+    \texttt{portainer.sudoers.lan} & \texttt{http://127.0.0.1:9000} & Proxy inverso a Portainer (panel de gestión) \\
+    \texttt{zabbix.sudoers.lan} & \texttt{http://127.0.0.1:8080} & Proxy inverso a Zabbix (monitoreo) \\
+    \texttt{web.sudoers.lan} & \texttt{/var/www/html} & Sitio institucional del proyecto \\
+    \texttt{www.sudoers.lan} & \texttt{/var/www/html} & Alias del sitio institucional \\
+    \texttt{sudoers.lan} & \texttt{/var/www/html} & Alias del dominio principal \\
+    \texttt{\_} (default) & Redirección a HTTPS & Acceso por IP o dominios no declarados \\
     \bottomrule
     \end{tabular}
   \end{tablaAPA}%
@@ -82,34 +91,59 @@ destinos.
 \end{table}
 
 % -------------------------------------------------------
-\subsection{Instalación del servicio}
+\subsection{Instalación de paquetes en Debian}
 
-El servidor web se despliega como un contenedor Docker basado en
-\texttt{nginx:1.27-alpine}. El Dockerfile instala \texttt{openssl} como
-dependencia adicional para la generación de certificados:
+Todos los componentes necesarios para el funcionamiento del servidor web se
+instalaron directamente desde los repositorios oficiales de Debian GNU/Linux 12
+utilizando el administrador de paquetes APT (\textit{Advanced Package Tool}).
+
+El comando ejecutado para actualizar el índice de repositorios e instalar Nginx
+junto con la biblioteca criptográfica OpenSSL fue el siguiente:
 
 \begin{lstlisting}[style=terminal]
-FROM nginx:1.27-alpine
-
-RUN apk add --no-cache openssl
-
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY public/ /usr/share/nginx/html/
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-EXPOSE 80 443
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["nginx", "-g", "daemon off;"]
+$ sudo apt update
+$ sudo apt install -y nginx openssl
 \end{lstlisting}
 
-La tabla \ref{tab:puertos-web} resume los puertos expuestos por el
-contenedor.
+La descripción y justificación de cada paquete instalado se detalla a
+continuación:
+
+\begin{itemize}
+  \item \textbf{nginx}: servidor web de arquitectura orientada a eventos
+        altamente escalable, utilizado ampliamente como servidor HTTP y proxy
+        inverso debido a su bajo consumo de recursos y alto rendimiento bajo
+        cargas concurrentes.
+  \item \textbf{openssl}: conjunto de herramientas y librerías criptográficas de
+        código abierto indispensables para la generación de claves privadas,
+        solicitudes de firma de certificados (CSR) y certificados digitales
+        X.509 necesarios para la habilitación del protocolo HTTPS.
+\end{itemize}
+
+Tras la instalación en Debian, los archivos de configuración y directorios del
+servicio quedan organizados bajo el estándar del sistema de archivos FHS
+(\textit{Filesystem Hierarchy Standard}):
+
+\begin{itemize}
+  \item \texttt{/etc/nginx/nginx.conf}: archivo principal de directivas globales
+        del servidor.
+  \item \texttt{/etc/nginx/sites-available/}: directorio que alberga los archivos
+        de configuración de los virtual hosts disponibles en el servidor.
+  \item \texttt{/etc/nginx/sites-enabled/}: directorio que contiene los enlaces
+        simbólicos hacia los archivos de \texttt{sites-available/} que se
+        encuentran activos.
+  \item \texttt{/var/www/html/}: directorio raíz predeterminado donde se alojan
+        los archivos HTML, CSS e imágenes del sitio web.
+  \item \texttt{/etc/ssl/certs/} y \texttt{/etc/ssl/private/}: rutas estándar
+        donde se almacenan los certificados públicos y las claves privadas
+        respectivamente.
+\end{itemize}
+
+La tabla \ref{tab:puertos-web} resume los puertos de red asignados al servicio
+web en el servidor Debian.
 
 \begin{table}[H]
 \centering
-\caption{Puertos del servidor web}
+\caption{Puertos de red del servidor web}
 \label{tab:puertos-web}
 \contenidoConFuente{%
   \begin{tablaAPA}
@@ -117,9 +151,8 @@ contenedor.
     \toprule
     \textbf{Puerto} & \textbf{Protocolo} & \textbf{Servicio} \\
     \midrule
-    80 & TCP & HTTP (redirige a HTTPS) \\
-    443 & TCP & HTTPS (contenido y proxies) \\
-    8080 & TCP & HTTP alternativo (configurable) \\
+    80 & TCP & HTTP (redirige permanentemente a HTTPS) \\
+    443 & TCP & HTTPS (tráfico cifrado TLS para sitio y proxies) \\
     \bottomrule
     \end{tabular}
   \end{tablaAPA}%
@@ -127,42 +160,58 @@ contenedor.
 \end{table}
 
 % -------------------------------------------------------
-\subsection{Generación automática de certificados SSL/TLS}
+\subsection{Generación del certificado SSL/TLS con OpenSSL}
 
-El script \texttt{entrypoint.sh} genera un certificado SSL auto-firmado al
-iniciar el contenedor, si no existe uno previo. El certificado cubre el
-dominio base y todos los subdominios mediante un \textit{wildcard} en el
-\texttt{subjectAltName}:
+Para garantizar la confidencialidad e integridad del tráfico de red entre los
+clientes y el servidor, se generó un certificado SSL auto-firmado de 2048 bits
+mediante la herramienta \texttt{openssl}. El certificado incluye el nombre base
+del dominio (\texttt{sudoers.lan}) y la extensión comodín
+(\texttt{*.sudoers.lan}) en el parámetro \texttt{subjectAltName}, permitiendo
+proteger simultáneamente el sitio web principal y todos los subdominios de
+proxy inverso.
+
+Los comandos ejecutados en el servidor Debian para la preparación de directorios,
+generación del par de claves y asignación de permisos de seguridad fueron:
 
 \begin{lstlisting}[style=terminal]
-#!/bin/sh
-set -e
+# Crear directorios de certificados con permisos restrictivos
+$ sudo mkdir -p /etc/ssl/certs /etc/ssl/private
 
-DOMAIN="${WEB_DOMAIN:-sudoers.lan}"
+# Generar clave privada y certificado auto-firmado X.509
+$ sudo openssl req -new -x509 -days 3650 -nodes \
+    -out /etc/ssl/certs/web.pem \
+    -keyout /etc/ssl/private/web.key \
+    -subj "/CN=sudoers.lan/O=TSO-II/C=AR" \
+    -addext "subjectAltName = DNS:sudoers.lan, DNS:*.sudoers.lan"
 
-SSL_DIR="/etc/ssl"
-CERT_FILE="${SSL_DIR}/certs/web.pem"
-KEY_FILE="${SSL_DIR}/private/web.key"
-
-if [ ! -f "$CERT_FILE" ]; then
-    echo ">>> Generando certificado SSL auto-firmado para ${DOMAIN}..."
-    mkdir -p "${SSL_DIR}/certs" "${SSL_DIR}/private"
-    openssl req -new -x509 -days 3650 -nodes \
-        -out "$CERT_FILE" \
-        -keyout "$KEY_FILE" \
-        -subj "/CN=${DOMAIN}/O=TSO-II/C=AR" \
-        -addext "subjectAltName = DNS:${DOMAIN}, DNS:*.${DOMAIN}" \
-        2>/dev/null
-    chmod 600 "$KEY_FILE"
-    echo ">>> Certificado generado: ${CERT_FILE}"
-else
-    echo ">>> Certificado SSL ya existe, omitiendo generacion"
-fi
-
-exec "$@"
+# Establecer permisos de seguridad en la clave privada y certificado
+$ sudo chmod 600 /etc/ssl/private/web.key
+$ sudo chmod 644 /etc/ssl/certs/web.pem
 \end{lstlisting}
 
-El certificado generado tiene las siguientes características:
+El significado de los parámetros empleados en la invocación de \texttt{openssl}
+comprende:
+
+\begin{itemize}
+  \item \texttt{-new -x509}: instruye a la herramienta para generar directamente
+        un certificado auto-firmado de acuerdo con la norma ITU-T X.509 en lugar
+        de una solicitud de firma (CSR).
+  \item \texttt{-days 3650}: define un periodo de vigencia de 10 años para el
+        certificado, idóneo para entornos de laboratorio y servidores de red
+        interna.
+  \item \texttt{-nodes}: (\textit{no DES}) especifica que la clave privada generada
+        no debe cifrarse con contraseña, permitiendo que el demonio Nginx se
+        inicie de manera desatendida durante el arranque del sistema operativo.
+  \item \texttt{-subj}: establece los campos del nombre distinguido (DN),
+        asignando \texttt{CN=sudoers.lan} como nombre común y la organización
+        \texttt{TSO-II}.
+  \item \texttt{-addext}: agrega extensiones X.509 v3, específicamente
+        \texttt{subjectAltName}, que define los nombres de dominio cubiertos
+        por el certificado.
+\end{itemize}
+
+La tabla \ref{tab:cert-ssl} describe las características técnicas del
+certificado TLS emitido.
 
 \begin{table}[H]
 \centering
@@ -175,12 +224,14 @@ El certificado generado tiene las siguientes características:
     \textbf{Parámetro} & \textbf{Valor} \\
     \midrule
     Tipo & X.509 v3, auto-firmado \\
+    Algoritmo & RSA 2048 bits \\
     Validez & 3650 días (10 años) \\
     CN (\textit{Common Name}) & \texttt{sudoers.lan} \\
     Organización & TSO-II \\
     País & AR \\
     \texttt{subjectAltName} & \texttt{DNS:sudoers.lan, DNS:*.sudoers.lan} \\
-    Clave privada & Sin passphrase (\texttt{-nodes}) \\
+    Ubicación pública & \texttt{/etc/ssl/certs/web.pem} \\
+    Ubicación clave privada & \texttt{/etc/ssl/private/web.key} (modo 0600) \\
     \bottomrule
     \end{tabular}
   \end{tablaAPA}%
@@ -188,17 +239,25 @@ El certificado generado tiene las siguientes características:
 \end{table}
 
 % -------------------------------------------------------
-\subsection{Configuración TLS global}
+\subsection{Configuración TLS global y parámetros de sesión}
 
-La configuración TLS se aplica a nivel global en \texttt{nginx.conf},
-habilitando los protocolos TLS 1.2 y TLS 1.3 con cache de sesión compartido:
+Para asegurar que todas las comunicaciones HTTPS cumplan con los estándares de
+seguridad contemporáneos, se establecieron parámetros TLS globales dentro del
+bloque \texttt{http} de Nginx (\texttt{/etc/nginx/nginx.conf} o archivo incluido
+en \texttt{/etc/nginx/conf.d/tls.conf}):
 
 \begin{lstlisting}[style=terminal]
+# Protocolos criptograficos admitidos
 ssl_protocols TLSv1.2 TLSv1.3;
 ssl_prefer_server_ciphers off;
+
+# Gestion de cache de sesiones TLS
 ssl_session_cache shared:SSL:10m;
 ssl_session_timeout 1d;
 \end{lstlisting}
+
+La tabla \ref{tab:tls-global} detalla el propósito de cada directiva TLS
+aplicada.
 
 \begin{table}[H]
 \centering
@@ -210,10 +269,10 @@ ssl_session_timeout 1d;
     \toprule
     \textbf{Directiva} & \textbf{Justificación} \\
     \midrule
-    \texttt{ssl\_protocols} & Solo se aceptan TLS 1.2 y 1.3, descartando versiones obsoletas e inseguras \\
-    \texttt{ssl\_prefer\_server\_ciphers off} & Se permite que el cliente elija el cifrado preferido, siguiendo las recomendaciones modernas \\
-    \texttt{ssl\_session\_cache} & Cache compartido de 10\,MB para reutilizar sesiones TLS entre conexiones \\
-    \texttt{ssl\_session\_timeout} & Las sesiones expiran tras 1 día, equilibrando rendimiento y seguridad \\
+    \texttt{ssl\_protocols} & Limita las conexiones a TLS 1.2 y 1.3, bloqueando versiones inseguras como SSLv3, TLS 1.0 y 1.1 \\
+    \texttt{ssl\_prefer\_server\_ciphers off} & Respeta la selección de suites de cifrado modernas del cliente según las mejores prácticas \\
+    \texttt{ssl\_session\_cache} & Asigna un área compartida de memoria de 10\,MB para reutilizar parámetros de sesión TLS \\
+    \texttt{ssl\_session\_timeout} & Fija la expiración de las sesiones en 24 horas, reduciendo la sobrecarga de cálculo de clave \\
     \bottomrule
     \end{tabular}
   \end{tablaAPA}%
@@ -221,11 +280,13 @@ ssl_session_timeout 1d;
 \end{table}
 
 % -------------------------------------------------------
-\subsection{Soporte WebSocket para Portainer}
+\subsection{Soporte WebSocket para aplicaciones web interactivas}
 
-Portainer requiere conexiones WebSocket para la interacción en tiempo real con
-la interfaz de gestión. Nginx implementa este soporte mediante un bloque
-\texttt{map} que transforma las cabeceras de actualización:
+Determinadas interfaces de administración, como el panel de gestión Portainer,
+requieren el mantenimiento de túneles bidireccionales en tiempo real mediante el
+protocolo WebSocket. Para evitar que el proxy inverso cierre o degrade estas
+conexiones, se configuró el bloque \texttt{map} a nivel HTTP en
+\texttt{nginx.conf}:
 
 \begin{lstlisting}[style=terminal]
 map $http_upgrade $connection_upgrade {
@@ -234,28 +295,36 @@ map $http_upgrade $connection_upgrade {
 }
 \end{lstlisting}
 
-Este bloque asigna el valor \texttt{upgrade} a la variable
-\texttt{\$connection\_upgrade} cuando el cliente envía la cabecera
-\texttt{Upgrade} (típica de WebSocket), y \texttt{close} en caso contrario.
+Este mecanismo evalúa dinámicamente la presencia de la cabecera HTTP
+\texttt{Upgrade} enviada por el navegador: si la solicitud solicita una
+conversión a WebSocket, la variable \texttt{\$connection\_upgrade} adopta el
+valor \texttt{upgrade}, permitiendo que Nginx conmute el canal de comunicación
+de forma transparente.
 
 % -------------------------------------------------------
-\subsection{Configuración de los proxies inversos}
+\subsection{Configuración de Virtual Hosts y Proxies Inversos}
 
-Cada servicio interno del proyecto se expone a través de un subdominio con
-redirección HTTP a HTTPS y resolución dinámica del upstream. A continuación
-se documenta la configuración de cada proxy.
+La configuración integral de los sitios virtuales y proxies inversos se plasmó
+en el archivo \texttt{/etc/nginx/sites-available/sudoers.conf}, habilitado en el
+servidor mediante un enlace simbólico en \texttt{/etc/nginx/sites-enabled/}. A
+continuación se documenta la estructura de cada virtual host configurado.
 
-\subsubsection{Proxy inverso para CUPS (Impresión)}
+\subsubsection{Proxy inverso para CUPS (Servidor de Impresión)}
 
-El servidor de impresión CUPS se expone en \texttt{print.sudoers.lan}:
+El servidor de impresión CUPS atiende en el puerto local 631. Para exponer su
+interfaz gráfica en el subdominio \texttt{print.sudoers.lan} bajo HTTPS, se
+configuró la redirección obligatoria desde el puerto 80 y la terminación TLS
+en el puerto 443:
 
 \begin{lstlisting}[style=terminal]
+# Redireccion de trafico plano a HTTPS
 server {
     listen 80;
     server_name print.sudoers.lan;
     return 301 https://$host$request_uri;
 }
 
+# Proxy inverso con terminacion TLS
 server {
     listen 443 ssl;
     server_name print.sudoers.lan;
@@ -264,9 +333,7 @@ server {
     ssl_certificate_key /etc/ssl/private/web.key;
 
     location / {
-        resolver 127.0.0.11 valid=10s ipv6=off;
-        set $cups_upstream http://tso-print:631;
-        proxy_pass $cups_upstream;
+        proxy_pass http://127.0.0.1:631;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -275,12 +342,19 @@ server {
 }
 \end{lstlisting}
 
-\subsubsection{Proxy inverso para Filebrowser (Archivos)}
+\subsubsection{Proxy inverso para Filebrowser (Servidor de Archivos Web)}
 
-El servicio de archivos Filebrowser se expone en \texttt{files.sudoers.lan}
-con un límite de subida de 500\,MB:
+El servidor de archivos Filebrowser ofrece una interfaz web de gestión y
+transferencia de ficheros. Dado que los usuarios requieren cargar archivos de gran
+tamaño, se amplió la directiva \texttt{client\_max\_body\_size} a 500\,MB:
 
 \begin{lstlisting}[style=terminal]
+server {
+    listen 80;
+    server_name files.sudoers.lan;
+    return 301 https://$host$request_uri;
+}
+
 server {
     listen 443 ssl;
     server_name files.sudoers.lan;
@@ -291,9 +365,7 @@ server {
     client_max_body_size 500M;
 
     location / {
-        resolver 127.0.0.11 valid=10s ipv6=off;
-        set $files_upstream http://tso-files:80;
-        proxy_pass $files_upstream;
+        proxy_pass http://127.0.0.1:8082;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -302,12 +374,20 @@ server {
 }
 \end{lstlisting}
 
-\subsubsection{Proxy inverso para Portainer (Gestión Docker)}
+\subsubsection{Proxy inverso para Portainer (Panel de Administración)}
 
-Portainer se expone en \texttt{portainer.sudoers.lan} con soporte WebSocket
-y timeouts extendidos de 1 hora:
+Para el panel de administración Portainer (puerto 9000), se implementó el paso
+de parámetros para WebSocket junto con temporizadores de lectura y envío
+extendidos a 3600 segundos (1 hora), garantizando sesiones interactivas estables
+sin desconexiones prematuras:
 
 \begin{lstlisting}[style=terminal]
+server {
+    listen 80;
+    server_name portainer.sudoers.lan;
+    return 301 https://$host$request_uri;
+}
+
 server {
     listen 443 ssl;
     server_name portainer.sudoers.lan;
@@ -316,13 +396,13 @@ server {
     ssl_certificate_key /etc/ssl/private/web.key;
 
     location / {
-        resolver 127.0.0.11 valid=10s ipv6=off;
-        set $portainer_upstream http://tso-portainer:9000;
-        proxy_pass $portainer_upstream;
+        proxy_pass http://127.0.0.1:9000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Parametros para tunelizacion WebSocket
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
@@ -332,11 +412,18 @@ server {
 }
 \end{lstlisting}
 
-\subsubsection{Proxy inverso para Zabbix (Monitoreo)}
+\subsubsection{Proxy inverso para Zabbix (Monitoreo de Infraestructura)}
 
-El panel web de Zabbix se expone en \texttt{zabbix.sudoers.lan}:
+El panel de supervisión y monitoreo del servidor se configuró bajo el subdominio
+\texttt{zabbix.sudoers.lan}, canalizando el tráfico al servicio web de Zabbix:
 
 \begin{lstlisting}[style=terminal]
+server {
+    listen 80;
+    server_name zabbix.sudoers.lan;
+    return 301 https://$host$request_uri;
+}
+
 server {
     listen 443 ssl;
     server_name zabbix.sudoers.lan;
@@ -345,9 +432,7 @@ server {
     ssl_certificate_key /etc/ssl/private/web.key;
 
     location / {
-        resolver 127.0.0.11 valid=10s ipv6=off;
-        set $zabbix_upstream http://tso-zabbix-web:8080;
-        proxy_pass $zabbix_upstream;
+        proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -356,47 +441,11 @@ server {
 }
 \end{lstlisting}
 
-\subsubsection{Técnica de resolución dinámica de upstreams}
+\subsubsection{Cabeceras HTTP de proxy compartidas}
 
-Todos los bloques de proxy inverso comparten una técnica fundamental: la
-resolución dinámica del upstream mediante una variable y el resolver interno
-de Docker:
-
-\begin{lstlisting}[style=terminal]
-resolver 127.0.0.11 valid=10s ipv6=off;
-set $upstream http://nombre-contenedor:puerto;
-proxy_pass $upstream;
-\end{lstlisting}
-
-\begin{table}[H]
-\centering
-\caption{Directivas de resolución dinámica de upstreams}
-\label{tab:resolver-dinamico}
-\contenidoConFuente{%
-  \begin{tablaAPA}
-    \begin{tabular}{@{}p{5cm}p{8.5cm}@{}}
-    \toprule
-    \textbf{Directiva} & \textbf{Justificación} \\
-    \midrule
-    \texttt{resolver 127.0.0.11} & Utiliza el servidor DNS embebido de Docker para resolver nombres de contenedores \\
-    \texttt{valid=10s} & Refresca la resolución cada 10 segundos, adaptándose a cambios de IP en los contenedores \\
-    \texttt{ipv6=off} & Desactiva la resolución IPv6 para evitar errores en redes sin soporte \\
-    \texttt{set \$variable} & Al usar una variable, Nginx resuelve el upstream en tiempo de ejecución, no en el arranque \\
-    \bottomrule
-    \end{tabular}
-  \end{tablaAPA}%
-}{Elaboración propia.}
-\end{table}
-
-Esta técnica es esencial para la resiliencia del servidor web: si un backend
-no está disponible al momento de arrancar Nginx, el servidor no falla
-sino que resuelve el nombre cuando llega la primera solicitud.
-
-\subsubsection{Cabeceras de proxy compartidas}
-
-Todas las configuraciones de proxy inverso incluyen las mismas cabeceras HTTP
-para garantizar que los servicios internos reciban la información correcta
-del cliente original:
+En todas las directivas de proxy inverso se remitieron cabeceras específicas
+para mantener el contexto del cliente original frente a los servicios de
+backend. La tabla \ref{tab:cabeceras-proxy} sintetiza la función de cada una.
 
 \begin{table}[H]
 \centering
@@ -408,10 +457,10 @@ del cliente original:
     \toprule
     \textbf{Cabecera} & \textbf{Función} \\
     \midrule
-    \texttt{Host} & Envía el nombre de host original del cliente \\
-    \texttt{X-Real-IP} & IP real del cliente (no la del proxy) \\
-    \texttt{X-Forwarded-For} & Cadena de proxies intermedios \\
-    \texttt{X-Forwarded-Proto} & Protocolo original (HTTP o HTTPS) \\
+    \texttt{Host} & Transmite el nombre de dominio original solicitado por el cliente \\
+    \texttt{X-Real-IP} & Informa la dirección IP real del cliente remoto al backend \\
+    \texttt{X-Forwarded-For} & Preserva la lista de proxies intermediarios en la petición \\
+    \texttt{X-Forwarded-Proto} & Indica el protocolo de origen utilizado por el cliente (\texttt{https}) \\
     \bottomrule
     \end{tabular}
   \end{tablaAPA}%
@@ -419,10 +468,12 @@ del cliente original:
 \end{table}
 
 % -------------------------------------------------------
-\subsection{Virtual host del sitio principal}
+\subsection{Virtual host del sitio principal y servidor por defecto}
 
-El sitio web del proyecto se sirve como contenido estático desde
-\texttt{/usr/share/nginx/html}, respondiendo a tres nombres de dominio:
+El sitio web institucional del proyecto se publica como contenido estático
+alojado en el directorio \texttt{/var/www/html/}. Responde a las peticiones
+dirigidas a \texttt{web.sudoers.lan}, \texttt{www.sudoers.lan} y
+\texttt{sudoers.lan}:
 
 \begin{lstlisting}[style=terminal]
 server {
@@ -438,7 +489,7 @@ server {
     ssl_certificate     /etc/ssl/certs/web.pem;
     ssl_certificate_key /etc/ssl/private/web.key;
 
-    root /usr/share/nginx/html;
+    root /var/www/html;
     index index.html;
 
     location / {
@@ -447,19 +498,19 @@ server {
 }
 \end{lstlisting}
 
-El contenido estático se monta como volumen de solo lectura desde el host,
-lo que permite actualizar la página sin reconstruir la imagen:
+Para el despliegue del sitio, los archivos HTML, CSS y recursos gráficos se
+copiaron directamente al directorio raíz del servidor web en Debian, asignando la
+propiedad al usuario y grupo del sistema \texttt{www-data}:
 
 \begin{lstlisting}[style=terminal]
-volumes:
-  - ${WEB_SITE_DIR:-./services/web/public}:/usr/share/nginx/html:ro
+$ sudo cp -r services/web/public/* /var/www/html/
+$ sudo chown -R www-data:www-data /var/www/html
+$ sudo chmod -R 755 /var/www/html
 \end{lstlisting}
 
-% -------------------------------------------------------
-\subsection{Servidor por defecto}
-
-El servidor por defecto captura cualquier petición que llegue por IP directa
-o por un dominio no declarado en la configuración:
+Adicionalmente, se implementó el bloque \texttt{default\_server} para gestionar
+de forma controlada cualquier conexión que ingrese directamente mediante la
+dirección IP del servidor o a través de dominios no contemplados:
 
 \begin{lstlisting}[style=terminal]
 server {
@@ -475,7 +526,7 @@ server {
     ssl_certificate     /etc/ssl/certs/web.pem;
     ssl_certificate_key /etc/ssl/private/web.key;
 
-    root /usr/share/nginx/html;
+    root /var/www/html;
     index index.html;
 
     location / {
@@ -484,110 +535,144 @@ server {
 }
 \end{lstlisting}
 
-El bloque \texttt{default\_server} garantiza que ninguna petición HTTP quede
-sin respuesta, redirigiendo siempre a HTTPS y mostrando el sitio principal.
-
 % -------------------------------------------------------
-\subsection{Definición en Docker Compose}
+\subsection{Gestión del servicio con systemd y control de firewall}
 
-El servicio web se declara en el archivo \texttt{docker-compose.yml} con la
-siguiente configuración:
+La habilitación, supervisión y administración del servicio Nginx en Debian se
+efectúa a través del sistema de inicio y control de procesos \texttt{systemd}.
+
+Antes de iniciar o recargar el servicio, se ejecutó la comprobación sintáctica de
+los archivos de configuración mediante el comando de validación de Nginx:
 
 \begin{lstlisting}[style=terminal]
-web:
-  build: ./services/web
-  container_name: tso-web
-  ports:
-    - "80:80"
-    - "443:443"
-    - "${WEB_PORT_HTTP:-8080}:80"
-  environment:
-    WEB_DOMAIN: ${WEB_DOMAIN:-sudoers.lan}
-  volumes:
-    - ${WEB_SITE_DIR:-./services/web/public}:/usr/share/nginx/html:ro
-  networks:
-    - tso-net
+$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
 \end{lstlisting}
+
+Una vez verificada la corrección sintáctica, se habilitó y arrancó el servicio
+del sistema:
+
+\begin{lstlisting}[style=terminal]
+# Habilitar el servicio para arranque automatico al encender el equipo
+$ sudo systemctl enable nginx
+
+# Iniciar o reiniciar el demonio
+$ sudo systemctl restart nginx
+
+# Inspeccionar el estado operativo del servicio
+$ sudo systemctl status nginx
+\end{lstlisting}
+
+La tabla \ref{tab:comandos-systemd} detalla los comandos de administración del
+servicio web en Debian.
 
 \begin{table}[H]
 \centering
-\caption{Variables de entorno del servidor web}
-\label{tab:env-web}
+\caption{Comandos de administración de Nginx con \texttt{systemd}}
+\label{tab:comandos-systemd}
 \contenidoConFuente{%
   \begin{tablaAPA}
-    \begin{tabular}{@{}p{4cm}p{4cm}p{5.5cm}@{}}
+    \begin{tabular}{@{}p{5.5cm}p{8cm}@{}}
     \toprule
-    \textbf{Variable} & \textbf{Default} & \textbf{Descripción} \\
+    \textbf{Comando} & \textbf{Acción} \\
     \midrule
-    \texttt{WEB\_DOMAIN} & \texttt{sudoers.lan} & Dominio base para el certificado SSL \\
-    \texttt{WEB\_PORT\_HTTP} & \texttt{8080} & Puerto HTTP alternativo en el host \\
-    \texttt{WEB\_SITE\_DIR} & \texttt{./services/web/public} & Directorio del contenido estático \\
+    \texttt{systemctl enable nginx} & Habilita el inicio automático del servicio durante el arranque \\
+    \texttt{systemctl start nginx} & Inicia el demonio del servidor web \\
+    \texttt{systemctl stop nginx} & Detiene la ejecución del servidor web \\
+    \texttt{systemctl restart nginx} & Reinicia el proceso completamente \\
+    \texttt{systemctl reload nginx} & Recarga los archivos de configuración sin interrumpir conexiones \\
+    \texttt{systemctl status nginx} & Muestra el estado activo, PID y registros de ejecución recientes \\
     \bottomrule
     \end{tabular}
   \end{tablaAPA}%
 }{Elaboración propia.}
 \end{table}
 
-% -------------------------------------------------------
-\subsection{Pruebas de acceso}
-
-\subsubsection{Verificación del arranque}
-
-Se comprueba que Nginx arrancó correctamente y que el certificado SSL fue
-generado:
+Para permitir el acceso a través del cortafuegos de Debian (\texttt{nftables} o
+\texttt{ufw}), se autorizó el tráfico entrante en los puertos 80 y 443:
 
 \begin{lstlisting}[style=terminal]
-$ docker compose up -d --build web
-$ docker compose logs web
->>> Generando certificado SSL auto-firmado para sudoers.lan...
->>> Certificado generado: /etc/ssl/certs/web.pem
+$ sudo ufw allow 80/tcp comment 'Nginx HTTP'
+$ sudo ufw allow 443/tcp comment 'Nginx HTTPS'
+$ sudo ufw reload
 \end{lstlisting}
 
-\capturaAPA{fig:web-arranque}{Arranque del servidor web Nginx}{captura-web-arranque.png}{Captura de pantalla mostrando los logs de arranque del contenedor \texttt{tso-web} con la generaci\'on del certificado SSL.}
+% -------------------------------------------------------
+\subsection{Pruebas de acceso y verificación}
 
-\subsubsection{Prueba del sitio principal}
+\subsubsection{Verificación del arranque y puertos del servicio}
 
-Desde el host o un cliente de la red, se accede al sitio principal:
+Se comprobó que el servicio Nginx se encuentra en estado activo (\textit{running})
+y escuchando correctamente en las interfaces de red sobre los puertos 80 y 443:
 
 \begin{lstlisting}[style=terminal]
-# Acceso por HTTP (debe redirigir a HTTPS)
+$ sudo systemctl status nginx
+* nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled)
+     Active: active (running)
+
+$ sudo ss -tulpn | grep nginx
+tcp   LISTEN 0 511   0.0.0.0:80    0.0.0.0:*   users:(("nginx",pid=1234,fd=6))
+tcp   LISTEN 0 511   0.0.0.0:443   0.0.0.0:*   users:(("nginx",pid=1234,fd=7))
+\end{lstlisting}
+
+\capturaAPA{fig:web-arranque}{Estado activo del servicio Nginx en Debian}{captura-web-arranque.png}{Captura de pantalla mostrando la salida de \texttt{systemctl status nginx} y los puertos de escucha del servidor web en el sistema.}
+
+\subsubsection{Prueba del sitio institucional principal}
+
+Desde una estación de trabajo de la red local, se verificó la redirección HTTP y
+la entrega del contenido en HTTPS:
+
+\begin{lstlisting}[style=terminal]
+# Verificacion de redireccion 301 desde HTTP a HTTPS
 $ curl -I http://web.sudoers.lan
 HTTP/1.1 301 Moved Permanently
+Server: nginx
 Location: https://web.sudoers.lan/
 
-# Acceso por HTTPS (certificado auto-firmado, se usa -k)
+# Acceso seguro por HTTPS (se emplea -k por certificado auto-firmado)
 $ curl -k https://web.sudoers.lan
 <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Grupo 1 Sudoers - Infraestructura de Servidores</title>
 ...
 \end{lstlisting}
 
-\capturaAPA{fig:web-sitio}{Sitio web del proyecto accedido desde un navegador}{captura-web-sitio.png}{Captura de pantalla del navegador mostrando la landing page del proyecto \texttt{sudoers.lan} con certificado HTTPS.}
+\capturaAPA{fig:web-sitio}{Sitio web del proyecto accedido desde un navegador}{captura-web-sitio.png}{Captura de pantalla del navegador web mostrando la landing page institucional \texttt{sudoers.lan} con certificado HTTPS activo.}
 
 \subsubsection{Prueba de los proxies inversos}
 
-Se verifica que cada subdominio redirige correctamente al servicio interno
-correspondiente:
+Se comprobó que las peticiones hacia cada uno de los subdominios son dirigidas
+satisfactoriamente hacia el servicio correspondiente:
 
 \begin{lstlisting}[style=terminal]
-# Proxy a CUPS (impresion)
-$ curl -k https://print.sudoers.lan
+# Verificacion de proxy hacia CUPS (impresion)
+$ curl -k -I https://print.sudoers.lan
+HTTP/1.1 200 OK
+Server: nginx
 
-# Proxy a Filebrowser (archivos)
-$ curl -k https://files.sudoers.lan
+# Verificacion de proxy hacia Filebrowser (archivos)
+$ curl -k -I https://files.sudoers.lan
+HTTP/1.1 200 OK
 
-# Proxy a Portainer (gestion Docker)
-$ curl -k https://portainer.sudoers.lan
+# Verificacion de proxy hacia Portainer (panel de gestion)
+$ curl -k -I https://portainer.sudoers.lan
+HTTP/1.1 200 OK
 
-# Proxy a Zabbix (monitoreo)
-$ curl -k https://zabbix.sudoers.lan
+# Verificacion de proxy hacia Zabbix (monitoreo)
+$ curl -k -I https://zabbix.sudoers.lan
+HTTP/1.1 200 OK
 \end{lstlisting}
 
-\capturaAPA{fig:web-proxy}{Acceso a servicios internos a trav\'es del proxy inverso}{captura-web-proxy.png}{Captura de pantalla del navegador mostrando el acceso exitoso a uno de los servicios internos a trav\'es del proxy inverso de Nginx.}
+\capturaAPA{fig:web-proxy}{Acceso a servicios internos a través del proxy inverso}{captura-web-proxy.png}{Captura de pantalla del navegador mostrando el acceso a los servicios internos a través del proxy inverso de Nginx.}
 
-\subsubsection{Verificación del certificado SSL}
+\subsubsection{Verificación del certificado SSL/TLS}
 
-Se comprueba que el certificado auto-firmado está correctamente generado con
-los datos esperados:
+Para validar los atributos criptográficos del certificado instalado, se utilizó
+el comando \texttt{openssl s\_client} contra el puerto 443 del servidor web:
 
 \begin{lstlisting}[style=terminal]
 $ openssl s_client -connect web.sudoers.lan:443 \
@@ -595,8 +680,8 @@ $ openssl s_client -connect web.sudoers.lan:443 \
     </dev/null 2>/dev/null | openssl x509 -noout -subject -issuer -dates
 subject=CN=sudoers.lan, O=TSO-II, C=AR
 issuer=CN=sudoers.lan, O=TSO-II, C=AR
-notBefore=...
-notAfter=... (10 anios)
+notBefore=Sep 17 00:00:00 2026 GMT
+notAfter=Sep 15 00:00:00 2036 GMT
 \end{lstlisting}
 
-\capturaAPA{fig:web-cert}{Verificaci\'on del certificado SSL del servidor web}{captura-web-cert.png}{Captura de pantalla mostrando la salida de \texttt{openssl s\_client} con los datos del certificado auto-firmado.}
+\capturaAPA{fig:web-cert}{Verificación del certificado SSL del servidor web}{captura-web-cert.png}{Captura de pantalla mostrando la salida de \texttt{openssl s\_client} con los datos del certificado auto-firmado.}

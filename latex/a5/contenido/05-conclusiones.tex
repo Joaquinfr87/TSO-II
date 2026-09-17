@@ -4,100 +4,112 @@
 
 \section{Conclusiones}
 
-La implementación del servidor web permitió comprender de manera integral el
-funcionamiento de este servicio fundamental en una infraestructura de red. A
-continuación se presentan las conclusiones más relevantes.
+La implementación del servidor web sobre Debian GNU/Linux permitió comprender
+de manera integral el funcionamiento, la administración y la integración de este
+servicio fundamental dentro de la infraestructura de red corporativa. A
+continuación se exponen los resultados alcanzados, los desafíos resueltos y las
+principales competencias desarrolladas.
 
 \subsection{Resultados obtenidos}
 
-El servidor web fue implementado exitosamente con las siguientes
-características verificadas:
+El servidor web fue implementado y puesto en producción de forma nativa en el
+servidor Debian, alcanzando los siguientes resultados comprobados:
 
 \begin{itemize}
-  \item Nginx operativo como servidor de contenido estático y proxy inverso,
-        atendiendo solicitudes HTTP y HTTPS en los puertos 80 y 443.
-  \item Certificado SSL/TLS auto-firmado generado automáticamente al
-        iniciar el contenedor, cubriendo el dominio base y todos los
-        subdominios del proyecto mediante \textit{wildcard}.
-  \item Redirección HTTP a HTTPS funcional en todos los virtual hosts,
-        garantizando que las comunicaciones se cifren.
-  \item Cinco proxies inversos configurados y operativos: CUPS (impresión),
-        Filebrowser (archivos), Portainer (gestión Docker), Zabbix (monitoreo)
-        y el sitio principal.
-  \item Soporte WebSocket para Portainer con timeouts extendidos.
-  \item Resolución dinámica de upstreams mediante el DNS embebido de Docker,
-        garantizando la resiliencia del servidor ante reinicios de backends.
-  \item Servidor por defecto (\texttt{default\_server}) que captura
-        peticiones por IP o dominios no declarados.
+  \item Nginx operativo como servidor de contenido estático y proxy inverso
+        centralizado, gestionando peticiones HTTP y HTTPS en los puertos estándar
+        80 y 443 mediante el sistema de inicialización \texttt{systemd}.
+  \item Certificado digital SSL/TLS auto-firmado generado con OpenSSL y
+        desplegado en \texttt{/etc/ssl/}, con cobertura integral del dominio
+        base (\texttt{sudoers.lan}) y todos los subdominios mediante la
+        extensión comodín \textit{wildcard} (\texttt{*.sudoers.lan}).
+  \item Redirección automática permanente (HTTP 301) hacia HTTPS aplicada en
+        todos los bloques de servidor, garantizando que ninguna transacción web
+        se efectúe sin cifrado criptográfico.
+  \item Integración de cuatro proxies inversos operativos para la
+        infraestructura: CUPS (impresión), Filebrowser (gestión de archivos),
+        Portainer (panel de administración) y Zabbix (supervisión y monitoreo).
+  \item Soporte de canalización WebSocket implementado satisfactoriamente para
+        conexiones dúplex en tiempo real hacia interfaces de gestión web.
+  \item Servidor por defecto (\texttt{default\_server}) configurado para
+        capturar accesos por dirección IP o nombres de host no registrados,
+        redirigiendo el tráfico al canal seguro.
+  \item Publicación de la landing page institucional del proyecto en
+        \texttt{/var/www/html/}, con permisos del sistema asignados al usuario
+        \texttt{www-data}.
 \end{itemize}
 
 \subsection{Dificultades encontradas}
 
-Durante la configuración se encontraron las siguientes dificultades:
+Durante el despliegue y afinamiento de la configuración se sortearon los
+siguientes obstáculos técnicos:
 
 \begin{itemize}
-  \item Certificados auto-firmados: el uso de certificados SSL
-        auto-firmados genera avisos de seguridad en los navegadores web,
-        requiriendo la aceptación manual de excepciones. En un entorno de
-        producción se recomienda utilizar certificados emitidos por una
-        autoridad de certificación confiable.
-  \item Resolución de upstreams en el arranque: Nginx falla si no puede
-        resolver un nombre de upstream al iniciar. Se solucionó utilizando
-        variables y el resolver de Docker (\texttt{127.0.0.11}), que permite
-        la resolución en tiempo de ejecución.
-  \item Soporte WebSocket para Portainer: la interfaz de Portainer
-        requiere conexiones WebSocket persistentes. Sin la configuración de
-        las cabeceras \texttt{Upgrade} y \texttt{Connection}, la interfaz no
-        funciona correctamente.
-  \item Tamaño de subida en Filebrowser: el límite predeterminado de
-        Nginx para el cuerpo de las solicitudes (1\,MB) era insuficiente para
-        la subida de archivos. Se solucionó con
-        \texttt{client\_max\_body\_size 500M}.
+  \item Confianza de certificados auto-firmados: al carecer de la firma de una
+        autoridad de certificación raíz comercial (CA), los navegadores web
+        alertan al usuario sobre la falta de validación de la cadena de
+        confianza. En el entorno de laboratorio se solventó agregando la
+        excepción de seguridad o importando el certificado en el almacén de
+        claves del cliente.
+  \item Enrutamiento y paso de cabeceras hacia backends heterogéneos: diversos
+        servicios internos esperaban recibir la información del cliente y el
+        nombre de host original para armar redirecciones internas correctas.
+        Esto se solucionó estandarizando el paso de las cabeceras \texttt{Host},
+        \texttt{X-Real-IP}, \texttt{X-Forwarded-For} y
+        \texttt{X-Forwarded-Proto}.
+  \item Conectividad dúplex interactiva en interfaces web: interfaces interactivas
+        como la consola de administración perdían conexión de inmediato bajo la
+        configuración proxy estándar de Nginx. Se requirió implementar el mapeo
+        condicional de las cabeceras \texttt{Upgrade} y \texttt{Connection}
+        junto con la ampliación de los temporizadores de lectura y transmisión.
+  \item Restricciones de carga en el servidor de archivos: el valor por defecto
+        de Nginx para el cuerpo de solicitudes HTTP (\texttt{client\_max\_body\_size}
+        de 1\,MB) provocaba el error \texttt{413 Request Entity Too Large} al
+        intentar transferir documentos en Filebrowser. La directiva se elevó a
+        500\,MB para satisfacer los requerimientos operativos.
 \end{itemize}
 
 \subsection{Importancia del servidor web en la administración de redes}
 
-El servidor web aporta los siguientes beneficios a la administración de
-sistemas:
+La centralización de servicios a través de Nginx en Debian proporciona las
+siguientes ventajas determinantes para la administración de sistemas:
 
 \begin{itemize}
-  \item Punto de entrada único: como proxy inverso, centraliza el acceso
-        a todos los servicios del proyecto bajo un único dominio con múltiples
-        subdominios.
-  \item Seguridad: la terminación TLS en Nginx cifra todas las
-        comunicaciones entre los clientes y los servicios internos, incluso
-        cuando los backends no implementan cifrado propio.
-  \item Flexibilidad: los virtual hosts permiten agregar nuevos servicios
-        sin modificar la infraestructura de red ni abrir puertos adicionales
-        en el firewall.
-  \item Presencia institucional: el sitio web estático del proyecto
-        proporciona una interfaz profesional accesible desde cualquier
-        navegador.
-  \item Simplicidad operativa: al concentrar la configuración TLS y el
-        enrutamiento en un solo punto, se simplifica la administración de
-        certificados y la gestión del acceso a los servicios.
+  \item Punto único de entrada: consolida el acceso a toda la gama de servicios
+        internos bajo una sola dirección IP pública y nombres de dominio
+        jerárquicos, reduciendo drásticamente la superficie de exposición y la
+        necesidad de abrir múltiples puertos en el cortafuegos perimetral.
+  \item Terminación TLS unificada: simplifica la administración de la seguridad,
+        ya que el cifrado, la renovación y la configuración de protocolos y
+        suites criptográficas se gestionan en un único punto (Nginx), liberando
+        a los servicios de backend de dicha sobrecarga de procesamiento.
+  \item Mantenibilidad y desacoplamiento: permite migrar, actualizar o
+        reubicar servicios de backend en diferentes puertos o direcciones IP
+        locales sin alterar la URL o la configuración que utilizan los usuarios
+        finales.
+  \item Identidad institucional: el sitio web estático proporciona un punto
+        de partida corporativo centralizado para la consulta de información y la
+        navegación hacia los recursos del dominio \texttt{sudoers.lan}.
 \end{itemize}
 
 \subsection{Aprendizajes adquiridos}
 
-El taller permitió desarrollar competencias prácticas en administración de
-servicios de red:
+El desarrollo práctico de esta actividad consolidó conocimientos fundamentales
+en la administración de servidores Debian:
 
 \begin{itemize}
-  \item Se comprendió el rol del servidor web como proxy inverso y
-        terminador TLS, consolidando el acceso a múltiples servicios bajo una
-        única interfaz HTTPS.
-  \item Se aprendió a configurar virtual hosts en Nginx para servir
-        múltiples subdominios con distintos backends.
-  \item Se implementó la generación automática de certificados SSL
-        auto-firmados, comprendiendo los conceptos de clave pública,
-        \texttt{subjectAltName} y cadenas de confianza.
-  \item Se comprendió la importancia de la resolución dinámica de upstreams
-        en entornos contenerizados, donde las direcciones IP de los servicios
-        pueden cambiar entre reinicios.
-  \item Se aprendió a configurar soporte WebSocket en Nginx para servicios
-        que requieren comunicación bidireccional en tiempo real.
-  \item Se valoró la infraestructura como código: toda la configuración
-        del servidor web quedó definida en archivos versionados,
-        permitiendo su reproducción exacta en cualquier entorno.
+  \item Se dominó la instalación, parametrización y administración del demonio
+        Nginx mediante paquetes APT y el subsistema de servicios \texttt{systemd}.
+  \item Se aprendió a estructurar y gestionar virtual hosts basados en nombres
+        (\textit{Name-based Virtual Hosting}) con separación limpia de sitios en
+        \texttt{sites-available} y \texttt{sites-enabled}.
+  \item Se adquirieron destrezas en criptografía práctica con OpenSSL,
+        generando certificados X.509 con directivas SAN comodín y aplicando
+        políticas modernas de endurecimiento TLS (TLS 1.2/1.3, cache de sesión).
+  \item Se comprendió el funcionamiento del proxy inverso HTTP/HTTPS y los
+        mecanismos de reenvío de tráfico TCP, cabeceras de auditoría y
+        transporte WebSocket.
+  \item Se reforzó el valor de la verificación previa de configuración
+        (\texttt{nginx -t}) y la inspección de registros para garantizar
+        despliegues robustos y sin interrupciones del servicio.
 \end{itemize}

@@ -12,29 +12,27 @@
 \contentsline {part}{CAP\'ITULO III\\DESARROLLO DEL TRABAJO}{5}{\spacefactor \@m {}currentHref}
 \contentsline {section}{\numberline {3.1}Desarrollo del trabajo}{5}{section.3.1}%
 \contentsline {subsection}{\numberline {3.1.1}Arquitectura del servicio}{5}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}Instalación del servicio}{6}{subsection.3.1.2}%
-\contentsline {subsection}{\numberline {3.1.3}Generación automática de certificados SSL/TLS}{7}{subsection.3.1.3}%
-\contentsline {subsection}{\numberline {3.1.4}Configuración TLS global}{8}{subsection.3.1.4}%
-\contentsline {subsection}{\numberline {3.1.5}Soporte WebSocket para Portainer}{9}{subsection.3.1.5}%
-\contentsline {subsection}{\numberline {3.1.6}Configuración de los proxies inversos}{9}{subsection.3.1.6}%
-\contentsline {subsubsection}{\numberline {3.1.6.1}Proxy inverso para CUPS (Impresión)}{9}{subsubsection.3.1.6.1}%
-\contentsline {subsubsection}{\numberline {3.1.6.2}Proxy inverso para Filebrowser (Archivos)}{10}{subsubsection.3.1.6.2}%
-\contentsline {subsubsection}{\numberline {3.1.6.3}Proxy inverso para Portainer (Gestión Docker)}{11}{subsubsection.3.1.6.3}%
-\contentsline {subsubsection}{\numberline {3.1.6.4}Proxy inverso para Zabbix (Monitoreo)}{12}{subsubsection.3.1.6.4}%
-\contentsline {subsubsection}{\numberline {3.1.6.5}Técnica de resolución dinámica de upstreams}{13}{subsubsection.3.1.6.5}%
-\contentsline {subsubsection}{\numberline {3.1.6.6}Cabeceras de proxy compartidas}{13}{subsubsection.3.1.6.6}%
-\contentsline {subsection}{\numberline {3.1.7}Virtual host del sitio principal}{14}{subsection.3.1.7}%
-\contentsline {subsection}{\numberline {3.1.8}Servidor por defecto}{15}{subsection.3.1.8}%
-\contentsline {subsection}{\numberline {3.1.9}Definición en Docker Compose}{15}{subsection.3.1.9}%
-\contentsline {subsection}{\numberline {3.1.10}Pruebas de acceso}{16}{subsection.3.1.10}%
-\contentsline {subsubsection}{\numberline {3.1.10.1}Verificación del arranque}{16}{subsubsection.3.1.10.1}%
-\contentsline {subsubsection}{\numberline {3.1.10.2}Prueba del sitio principal}{17}{subsubsection.3.1.10.2}%
-\contentsline {subsubsection}{\numberline {3.1.10.3}Prueba de los proxies inversos}{18}{subsubsection.3.1.10.3}%
-\contentsline {subsubsection}{\numberline {3.1.10.4}Verificación del certificado SSL}{19}{subsubsection.3.1.10.4}%
-\contentsline {part}{CONCLUSIONES}{21}{figure.5}%
-\contentsline {section}{\numberline {4.}Conclusiones}{21}{section.4.}%
-\contentsline {subsection}{\numberline {4.1}Resultados obtenidos}{21}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Dificultades encontradas}{21}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Importancia del servidor web en la administración de redes}{22}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Aprendizajes adquiridos}{22}{subsection.4.4}%
-\contentsline {part}{REFERENCIAS}{24}{subsection.4.4}%
+\contentsline {subsection}{\numberline {3.1.2}Instalación de paquetes en Debian}{6}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Generación del certificado SSL/TLS con OpenSSL}{8}{subsection.3.1.3}%
+\contentsline {subsection}{\numberline {3.1.4}Configuración TLS global y parámetros de sesión}{9}{subsection.3.1.4}%
+\contentsline {subsection}{\numberline {3.1.5}Soporte WebSocket para aplicaciones web interactivas}{10}{subsection.3.1.5}%
+\contentsline {subsection}{\numberline {3.1.6}Configuración de Virtual Hosts y Proxies Inversos}{11}{subsection.3.1.6}%
+\contentsline {subsubsection}{\numberline {3.1.6.1}Proxy inverso para CUPS (Servidor de Impresión)}{11}{subsubsection.3.1.6.1}%
+\contentsline {subsubsection}{\numberline {3.1.6.2}Proxy inverso para Filebrowser (Servidor de Archivos Web)}{12}{subsubsection.3.1.6.2}%
+\contentsline {subsubsection}{\numberline {3.1.6.3}Proxy inverso para Portainer (Panel de Administración)}{13}{subsubsection.3.1.6.3}%
+\contentsline {subsubsection}{\numberline {3.1.6.4}Proxy inverso para Zabbix (Monitoreo de Infraestructura)}{14}{subsubsection.3.1.6.4}%
+\contentsline {subsubsection}{\numberline {3.1.6.5}Cabeceras HTTP de proxy compartidas}{15}{subsubsection.3.1.6.5}%
+\contentsline {subsection}{\numberline {3.1.7}Virtual host del sitio principal y servidor por defecto}{15}{subsection.3.1.7}%
+\contentsline {subsection}{\numberline {3.1.8}Gestión del servicio con systemd y control de firewall}{17}{subsection.3.1.8}%
+\contentsline {subsection}{\numberline {3.1.9}Pruebas de acceso y verificación}{18}{subsection.3.1.9}%
+\contentsline {subsubsection}{\numberline {3.1.9.1}Verificación del arranque y puertos del servicio}{18}{subsubsection.3.1.9.1}%
+\contentsline {subsubsection}{\numberline {3.1.9.2}Prueba del sitio institucional principal}{19}{subsubsection.3.1.9.2}%
+\contentsline {subsubsection}{\numberline {3.1.9.3}Prueba de los proxies inversos}{20}{subsubsection.3.1.9.3}%
+\contentsline {subsubsection}{\numberline {3.1.9.4}Verificación del certificado SSL/TLS}{21}{subsubsection.3.1.9.4}%
+\contentsline {part}{CONCLUSIONES}{23}{figure.5}%
+\contentsline {section}{\numberline {4.}Conclusiones}{23}{section.4.}%
+\contentsline {subsection}{\numberline {4.1}Resultados obtenidos}{23}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Dificultades encontradas}{24}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Importancia del servidor web en la administración de redes}{24}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Aprendizajes adquiridos}{25}{subsection.4.4}%
+\contentsline {part}{REFERENCIAS}{26}{subsection.4.4}%

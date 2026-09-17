@@ -23,11 +23,13 @@ proyecto integrador del curso de Taller de Sistemas Operativos II,
 desarrollado por el equipo \textit{Grupo 1 Sudoers} en el dominio
 \texttt{sudoers.lan}. Se implementó Nginx, configurado como servidor de
 contenido estático, proxy inverso hacia los servicios internos del proyecto
-(impresión, archivos, monitoreo y gestión Docker) y terminador TLS con
+(servidor de impresión CUPS, servidor de archivos web, plataforma de gestión
+Portainer y sistema de monitoreo Zabbix) y terminador TLS con
 certificados auto-firmados.
 
-El servicio se despliega sobre un servidor Debian mediante un contenedor
-Docker, integrándose con el servidor DNS (BIND9) del proyecto para la
+El servicio se despliega de manera nativa sobre un servidor Debian GNU/Linux
+12 (Bookworm) mediante el gestor de paquetes APT y administrado por
+\texttt{systemd}, integrándose con el servidor DNS (BIND9) del proyecto para la
 resolución de nombres dentro del dominio \texttt{sudoers.lan}.
 
 Este capítulo introduce el contexto general del taller y presenta la

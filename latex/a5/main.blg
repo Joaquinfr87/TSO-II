@@ -1,29 +1,31 @@
-This is BibTeX, Version 0.99e (TeX Live 2026/Arch Linux)
+This is BibTeX, Version 0.99e
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
+Reallocating 'name_of_file' (item size: 1) to 8 items.
 The style file: apacite.bst
-Reallocated glb_str_ptr (elt_size=8) to 20 items from 10.
-Reallocated global_strs (elt_size=200001) to 20 items from 10.
-Reallocated glb_str_end (elt_size=8) to 20 items from 10.
-Reallocated singl_function (elt_size=8) to 100 items from 50.
-Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
-Reallocated singl_function (elt_size=8) to 100 items from 50.
-Reallocated singl_function (elt_size=8) to 100 items from 50.
-Reallocated wiz_functions (elt_size=8) to 9000 items from 6000.
-Reallocated singl_function (elt_size=8) to 100 items from 50.
+Reallocating 'name_of_file' (item size: 1) to 20 items.
+Reallocating 'glb_str_end' (item size: 4) to 20 items.
+Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
+Reallocating 'global_strs' (item size: 1) to 4000000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 9000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: formato/referencias.bib
 apacite.bst [2013/07/21 v6.03 APA bibliography style]
 You've used 5 entries,
             6951 wiz_defined-function locations,
-            1297 strings with 11492 characters,
-and the built_in function-call counts, 7395 in all, are:
-= -- 925
+            1297 strings with 11525 characters,
+and the built_in function-call counts, 7510 in all, are:
+= -- 938
 > -- 58
-< -- 290
-+ -- 261
+< -- 303
++ -- 274
 - -- 16
-* -- 418
-:= -- 1285
+* -- 429
+:= -- 1322
 add.period$ -- 23
 call.type$ -- 5
 change.case$ -- 85
@@ -32,7 +34,7 @@ cite$ -- 10
 duplicate$ -- 187
 empty$ -- 355
 format.name$ -- 90
-if$ -- 1509
+if$ -- 1522
 int.to.chr$ -- 0
 int.to.str$ -- 15
 missing$ -- 0
@@ -42,9 +44,9 @@ pop$ -- 295
 preamble$ -- 1
 purify$ -- 20
 quote$ -- 0
-skip$ -- 400
+skip$ -- 402
 stack$ -- 0
-substring$ -- 291
+substring$ -- 304
 swap$ -- 106
 text.length$ -- 13
 text.prefix$ -- 0

@@ -1,8 +1,9 @@
-# Informe — Actividad 5: DHCP + Servidor Web
+# Informe — Actividad 5: Servidor Web (Nginx en Debian)
 
 Documentación LaTeX del informe de la Actividad 5 del Taller de Sistemas
-Operativos II. Cubre la configuración del servicio DHCP (Kea) y del
-servidor web (Nginx) del proyecto **Grupo 1 Sudoers**.
+Operativos II. Cubre la instalación nativa, configuración y verificación
+del servidor web (Nginx) y proxy inverso del proyecto **Grupo 1 Sudoers**
+sobre Debian GNU/Linux 12 (Bookworm).
 
 ## Estructura
 
@@ -10,11 +11,12 @@ servidor web (Nginx) del proyecto **Grupo 1 Sudoers**.
 a5/
 ├── main.tex              # Documento principal (integra los módulos)
 ├── Makefile              # Compilar con: make
+├── guia-capturas.md      # Guía de comandos para obtener las capturas
 ├── contenido/
 │   ├── 01-introduccion.tex   # Capítulo I: Introducción
 │   ├── 02-objetivos.tex      # Capítulo II: Objetivos
 │   ├── 03-alcance.tex        # Capítulo II: Alcance y Límites
-│   ├── 04-desarrollo.tex     # Capítulo III: Desarrollo (DHCP + Web)
+│   ├── 04-desarrollo.tex     # Capítulo III: Desarrollo (Nginx en Debian)
 │   └── 05-conclusiones.tex   # Capítulo IV: Conclusiones
 ├── formato/
 │   ├── preambulo.sty         # Configuración de formato (APA + Arial)
@@ -22,7 +24,7 @@ a5/
 │   └── referencias.bib       # Referencias bibliográficas
 ├── figuras/
 │   ├── logo.png              # Logo institucional
-│   └── (capturas pendientes)
+│   └── (capturas esperadas)
 └── anexos/
     └── anexo-a.tex           # Material complementario
 ```
@@ -43,20 +45,17 @@ O manualmente:
 pdflatex main && bibtex main && pdflatex main && pdflatex main
 ```
 
-## Capturas pendientes
+## Capturas esperadas
 
 El informe incluye placeholders para capturas de pantalla que deben
-realizarse durante las pruebas. Los archivos esperados en `figuras/`:
+realizarse durante las pruebas del servidor en Debian. Los archivos esperados en `figuras/`:
 
-| Archivo | Descripción |
-|---|---|
-| `captura-dhcp-config.png` | Configuración aplicada de Kea DHCP |
-| `captura-dhcp-cliente.png` | Asignación de IP desde un cliente |
-| `captura-dhcp-leases.png` | Tabla de concesiones del servidor |
-| `captura-web-arranque.png` | Logs de arranque de Nginx |
-| `captura-web-sitio.png` | Sitio web del proyecto en el navegador |
-| `captura-web-proxy.png` | Acceso a servicios via proxy inverso |
-| `captura-web-cert.png` | Verificación del certificado SSL |
+| Archivo | Descripción | Comando / Acción |
+|---|---|---|
+| `captura-web-arranque.png` | Estado activo de Nginx y puertos en Debian | `systemctl status nginx` y `ss -tulpn \| grep nginx` |
+| `captura-web-sitio.png` | Sitio web del proyecto en el navegador | Navegador en `https://web.sudoers.lan` |
+| `captura-web-proxy.png` | Acceso a servicios via proxy inverso | Navegador en `https://print.sudoers.lan` o consola con `curl` |
+| `captura-web-cert.png` | Verificación del certificado SSL | `openssl s_client -connect web.sudoers.lan:443 ...` |
 
-Si una captura no existe, el PDF mostrará un recuadro con la descripción
+Si una captura no existe en `figuras/`, el PDF mostrará un recuadro con la descripción
 de la captura pendiente y el nombre del archivo esperado.
