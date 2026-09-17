@@ -18,32 +18,32 @@
 \contentsline {subsubsection}{\numberline {3.2.3.1}Interfaz y base de datos de concesiones}{9}{subsubsection.3.2.3.1}%
 \contentsline {subsubsection}{\numberline {3.2.3.2}Subred, ámbito y opciones}{9}{subsubsection.3.2.3.2}%
 \contentsline {subsection}{\numberline {3.2.4}Desactivación del DHCP del router}{10}{subsection.3.2.4}%
-\contentsline {subsection}{\numberline {3.2.5}Verificación del servicio}{10}{subsection.3.2.5}%
-\contentsline {subsection}{\numberline {3.2.6}Pruebas de asignación desde clientes}{11}{subsection.3.2.6}%
-\contentsline {subsection}{\numberline {3.2.7}Registro de concesiones}{12}{subsection.3.2.7}%
-\contentsline {section}{\numberline {3.3}Servidor Web}{14}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Arquitectura del servicio}{14}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Instalación de paquetes en Debian}{15}{subsection.3.3.2}%
-\contentsline {subsection}{\numberline {3.3.3}Generación del certificado SSL/TLS con OpenSSL}{17}{subsection.3.3.3}%
-\contentsline {subsection}{\numberline {3.3.4}Configuración TLS global y parámetros de sesión}{18}{subsection.3.3.4}%
-\contentsline {subsection}{\numberline {3.3.5}Soporte WebSocket para aplicaciones web interactivas}{19}{subsection.3.3.5}%
-\contentsline {subsection}{\numberline {3.3.6}Configuración de Virtual Hosts y Proxies Inversos}{20}{subsection.3.3.6}%
-\contentsline {subsubsection}{\numberline {3.3.6.1}Proxy inverso para CUPS (Servidor de Impresión)}{20}{subsubsection.3.3.6.1}%
-\contentsline {subsubsection}{\numberline {3.3.6.2}Proxy inverso para Filebrowser (Servidor de Archivos Web)}{21}{subsubsection.3.3.6.2}%
-\contentsline {subsubsection}{\numberline {3.3.6.3}Proxy inverso para Portainer (Panel de Administración)}{22}{subsubsection.3.3.6.3}%
-\contentsline {subsubsection}{\numberline {3.3.6.4}Proxy inverso para Zabbix (Monitoreo de Infraestructura)}{23}{subsubsection.3.3.6.4}%
-\contentsline {subsubsection}{\numberline {3.3.6.5}Cabeceras HTTP de proxy compartidas}{24}{subsubsection.3.3.6.5}%
-\contentsline {subsection}{\numberline {3.3.7}Virtual host del sitio principal y servidor por defecto}{24}{subsection.3.3.7}%
-\contentsline {subsection}{\numberline {3.3.8}Gestión del servicio con systemd y control de firewall}{26}{subsection.3.3.8}%
-\contentsline {subsection}{\numberline {3.3.9}Pruebas de acceso y verificación}{27}{subsection.3.3.9}%
-\contentsline {subsubsection}{\numberline {3.3.9.1}Verificación del arranque y puertos del servicio}{27}{subsubsection.3.3.9.1}%
-\contentsline {subsubsection}{\numberline {3.3.9.2}Prueba del sitio institucional principal}{28}{subsubsection.3.3.9.2}%
-\contentsline {subsubsection}{\numberline {3.3.9.3}Prueba de los proxies inversos}{29}{subsubsection.3.3.9.3}%
-\contentsline {subsubsection}{\numberline {3.3.9.4}Verificación del certificado SSL/TLS}{30}{subsubsection.3.3.9.4}%
-\contentsline {part}{CONCLUSIONES}{32}{figure.11}%
-\contentsline {section}{\numberline {4.}Conclusiones}{32}{section.4.}%
-\contentsline {subsection}{\numberline {4.1}Resultados obtenidos}{32}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Dificultades encontradas}{33}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Importancia de los servicios en la administración de redes}{34}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Aprendizajes adquiridos}{35}{subsection.4.4}%
-\contentsline {part}{REFERENCIAS}{36}{subsection.4.4}%
+\contentsline {subsection}{\numberline {3.2.5}Verificación del servicio}{11}{subsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.2.6}Pruebas de asignación desde clientes}{12}{subsection.3.2.6}%
+\contentsline {subsection}{\numberline {3.2.7}Registro de concesiones}{13}{subsection.3.2.7}%
+\contentsline {section}{\numberline {3.3}Servidor Web}{15}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Arquitectura del servicio}{15}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Instalación de paquetes en Debian}{16}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Generación del certificado SSL/TLS con OpenSSL}{18}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Configuración TLS global y parámetros de sesión}{19}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.5}Soporte WebSocket para aplicaciones web interactivas}{20}{subsection.3.3.5}%
+\contentsline {subsection}{\numberline {3.3.6}Configuración de Virtual Hosts y Proxies Inversos}{21}{subsection.3.3.6}%
+\contentsline {subsubsection}{\numberline {3.3.6.1}Proxy inverso para CUPS (Servidor de Impresión)}{21}{subsubsection.3.3.6.1}%
+\contentsline {subsubsection}{\numberline {3.3.6.2}Proxy inverso para Filebrowser (Servidor de Archivos Web)}{22}{subsubsection.3.3.6.2}%
+\contentsline {subsubsection}{\numberline {3.3.6.3}Proxy inverso para Portainer (Panel de Administración)}{23}{subsubsection.3.3.6.3}%
+\contentsline {subsubsection}{\numberline {3.3.6.4}Proxy inverso para Zabbix (Monitoreo de Infraestructura)}{24}{subsubsection.3.3.6.4}%
+\contentsline {subsubsection}{\numberline {3.3.6.5}Cabeceras HTTP de proxy compartidas}{25}{subsubsection.3.3.6.5}%
+\contentsline {subsection}{\numberline {3.3.7}Virtual host del sitio principal y servidor por defecto}{25}{subsection.3.3.7}%
+\contentsline {subsection}{\numberline {3.3.8}Gestión del servicio con systemd y control de firewall}{27}{subsection.3.3.8}%
+\contentsline {subsection}{\numberline {3.3.9}Pruebas de acceso y verificación}{28}{subsection.3.3.9}%
+\contentsline {subsubsection}{\numberline {3.3.9.1}Verificación del arranque y puertos del servicio}{28}{subsubsection.3.3.9.1}%
+\contentsline {subsubsection}{\numberline {3.3.9.2}Prueba del sitio institucional principal}{29}{subsubsection.3.3.9.2}%
+\contentsline {subsubsection}{\numberline {3.3.9.3}Prueba de los proxies inversos}{30}{subsubsection.3.3.9.3}%
+\contentsline {subsubsection}{\numberline {3.3.9.4}Verificación del certificado SSL/TLS}{31}{subsubsection.3.3.9.4}%
+\contentsline {part}{CONCLUSIONES}{33}{figure.12}%
+\contentsline {section}{\numberline {4.}Conclusiones}{33}{section.4.}%
+\contentsline {subsection}{\numberline {4.1}Resultados obtenidos}{33}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Dificultades encontradas}{34}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Importancia de los servicios en la administración de redes}{35}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Aprendizajes adquiridos}{36}{subsection.4.4}%
+\contentsline {part}{REFERENCIAS}{37}{subsection.4.4}%

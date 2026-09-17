@@ -1,7 +1,7 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {table}{\numberline {1}{\ignorespaces Virtual hosts configurados en Nginx}}{15}{table.caption.1}%
-\contentsline {table}{\numberline {2}{\ignorespaces Puertos de red del servidor web}}{17}{table.caption.2}%
-\contentsline {table}{\numberline {3}{\ignorespaces Características del certificado SSL auto-firmado}}{18}{table.caption.3}%
-\contentsline {table}{\numberline {4}{\ignorespaces Directivas TLS globales de Nginx}}{19}{table.caption.4}%
-\contentsline {table}{\numberline {5}{\ignorespaces Cabeceras HTTP de los proxies inversos}}{24}{table.caption.5}%
-\contentsline {table}{\numberline {6}{\ignorespaces Comandos de administración de Nginx con \texttt {systemd}}}{27}{table.caption.6}%
+\contentsline {table}{\numberline {1}{\ignorespaces Virtual hosts configurados en Nginx}}{16}{table.caption.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces Puertos de red del servidor web}}{18}{table.caption.2}%
+\contentsline {table}{\numberline {3}{\ignorespaces Características del certificado SSL auto-firmado}}{19}{table.caption.3}%
+\contentsline {table}{\numberline {4}{\ignorespaces Directivas TLS globales de Nginx}}{20}{table.caption.4}%
+\contentsline {table}{\numberline {5}{\ignorespaces Cabeceras HTTP de los proxies inversos}}{25}{table.caption.5}%
+\contentsline {table}{\numberline {6}{\ignorespaces Comandos de administración de Nginx con \texttt {systemd}}}{28}{table.caption.6}%
