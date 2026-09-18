@@ -26,6 +26,7 @@ services:
   dns:
     build: ./services/dns
     container_name: tso-dns
+    restart: unless-stopped
     # 53/udp: resolución DNS para la red local
     # 53/tcp: transferencias de zona
     ports:
@@ -46,6 +47,7 @@ services:
   dhcp:
     build: ./services/dhcp
     container_name: tso-dhcp
+    restart: unless-stopped
     # 67/udp: descubrimiento y oferta DHCP
     ports:
       - "67:67/udp"
@@ -66,6 +68,7 @@ services:
   database:
     build: ./services/database
     container_name: tso-db
+    restart: unless-stopped
     ports:
       - "${DB_PORT:-5432}:5432"
     environment:
@@ -83,6 +86,7 @@ services:
   web:
     build: ./services/web
     container_name: tso-web
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -101,6 +105,7 @@ services:
     build: ./services/files
     container_name: tso-files
     privileged: true
+    restart: unless-stopped
     ports:
       - "${SMB_PORT_445:-445}:445"
       - "139:139"
@@ -121,6 +126,7 @@ services:
   mail:
     build: ./services/mail
     container_name: tso-mail
+    restart: unless-stopped
     ports:
       - "25:25"        # SMTP (transferencia entre servidores)
       - "587:587"      # SMTP Submission (clientes con auth)
@@ -141,6 +147,7 @@ services:
   print:
     build: ./services/print
     container_name: tso-print
+    restart: unless-stopped
     ports:
       - "${CUPS_PORT:-1631}:631"
     environment:
