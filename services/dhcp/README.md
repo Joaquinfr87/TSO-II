@@ -57,34 +57,35 @@ docker compose up -d --build dhcp
 
 ## Red y broadcast (importante)
 
-El contenedor `dhcp` corre en la **red bridge de Docker** (`tso-net`) y publica el puerto `67:67/udp`. El bridge de Docker **no reenvía los broadcasts de la LAN física** al contenedor, y los clientes DHCP descubren al servidor **por broadcast**. Por eso, con esta configuración, un cliente en **otra máquina** de la misma red física **no va a encontrar a Kea** aunque el puerto esté publicado: la concesión solo se puede ver probando dentro del host.
+El contenedor `dhcp` corre con **`network_mode: host`** y escucha solo en la interfaz física `DHCP_INTERFACE` (ej: `wlo1`). Es la única configuración que funciona en WiFi: los broadcasts de los clientes llegan a Kea y las respuestas (OFFER/ACK) salen con la **MAC real del server**. Con bridge o `macvlan` el AP descarta las respuestas que salen con una MAC virtual desconocida, y por eso el cliente se queda sin IP.
 
-Opciones para que DHCP responda en una red real (a evaluar cuando se pruebe con clientes):
+Alternativa considerada (descartada en la práctica):
 
-| Opción | Cómo | Trade-off |
-|---|---|---|
-| `network_mode: host` | Kea escucha directo en las interfaces físicas del servidor (el `ports:` no aplica y queda fuera de `tso-net`) | Simple y típico para DHCP; comparte red con el host |
-| Red `macvlan` | Contenedor con IP propia en la LAN | Más aislado, más complejo de configurar |
+| Opción | Resultado |
+|---|---|
+| Red bridge + puerto `67:67/udp` | El bridge no reenvía los broadcasts de la LAN al contenedor |
+| Red `macvlan` | Recibe los `DISCOVER`, pero el OFFER sale con una MAC desconocida para el AP WiFi y el cliente nunca completa la concesión |
 
-> **Decisión actual**: se mantiene en **bridge** (sirve para probar el servicio a nivel contenedor). La prueba con clientes reales queda pendiente hasta desplegar con `network_mode: host` o `macvlan` en la máquina física.
+> **Decisión actual**: `network_mode: host` con `DHCP_INTERFACE` apuntando a la interfaz física (wlo1).
 
 ## Variables de entorno
 
 | Variable | Default | Descripción |
 |---|---|---|
 | `DHCP_SUBNET` | `192.168.1.0/24` | Red que atiende el servidor |
-| `DHCP_POOL` | `192.168.1.100 - 192.168.1.200` | Rango de IPs que entrega a los clientes |
+| `DHCP_POOL` | `192.168.1.110 - 192.168.1.254` | Rango de IPs que entrega a los clientes |
 | `DHCP_DNS` | `192.168.1.10` | IP del servidor DNS que se anuncia a los clientes |
+| `DHCP_ROUTER` | `192.168.1.1` | Gateway que se anuncia a los clientes (`routers`) |
+| `DHCP_INTERFACE` | `wlo1` | Interfaz física donde escucha Kea (necesario con `network_mode: host`) |
 | `DNS_DOMAIN` | `sudoers.lan` | Dominio interno del proyecto |
-| `HOST_IP` | `192.168.1.10` | IP del servidor; se anuncia como puerta de enlace (`routers`) |
 
 ## Estado
 
 - [x] Imagen Kea construida y arranque por entrypoint
 - [x] Subred, pool, DNS, dominio y gateway parametrizados por variables
 - [x] Logs en stdout (visibles con `docker compose logs dhcp`)
+- [x] Clientes reales atendidos (prueba con router sin DHCP propio)
 - [ ] Confirmar la red real del proyecto (subnet/pool definitivos)
-- [ ] Probar con un cliente DHCP físico en la red (necesita `network_mode: host` o red `macvlan`)
 - [ ] Actualizar repartición cuando se confirme el rango
 
 ## Interacción con otros servicios

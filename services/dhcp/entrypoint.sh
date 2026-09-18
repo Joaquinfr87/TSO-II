@@ -12,6 +12,7 @@ POOL="${DHCP_POOL:-192.168.1.100 - 192.168.1.200}"
 DNS_SRV="${DHCP_DNS:-${HOST_IP:-192.168.1.10}}"
 DOMAIN="${DNS_DOMAIN:-sudoers.lan}"
 ROUTER="${DHCP_ROUTER:-${HOST_IP:-192.168.1.10}}"
+IFACE="${DHCP_INTERFACE:-wlo1}"
 
 CONF="/etc/kea/kea-dhcp4.conf"
 
@@ -31,6 +32,7 @@ sed -i \
     -e "s|__DHCP_DNS__|${DNS_SRV}|g" \
     -e "s|__DNS_DOMAIN__|${DOMAIN}|g" \
     -e "s|__HOST_IP__|${ROUTER}|g" \
+    -e "s|__DHCP_INTERFACE__|${IFACE}|g" \
     "${CONF}"
 
 echo "============================================"
@@ -40,6 +42,7 @@ echo "  Pool:     ${POOL}"
 echo "  DNS:      ${DNS_SRV}"
 echo "  Dominio:  ${DOMAIN}"
 echo "  Gateway:  ${ROUTER}"
+echo "  Interfaz: ${IFACE}"
 echo "============================================"
 
 exec /usr/sbin/kea-dhcp4 -c "${CONF}"
