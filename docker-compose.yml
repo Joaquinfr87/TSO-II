@@ -48,19 +48,19 @@ services:
     build: ./services/dhcp
     container_name: tso-dhcp
     restart: unless-stopped
-    # 67/udp: descubrimiento y oferta DHCP
-    ports:
-      - "67:67/udp"
+    # Red macvlan: IP propia en la LAN física para recibir los broadcasts DHCP.
+    # (El bridge de Docker NO reenvía los broadcasts de la LAN al contenedor)
     environment:
       DHCP_SUBNET: ${DHCP_SUBNET:-192.168.1.0/24}
       DHCP_POOL: ${DHCP_POOL:-192.168.1.100 - 192.168.1.200}
       DHCP_DNS: ${DHCP_DNS:-192.168.1.10}
       DNS_DOMAIN: ${DNS_DOMAIN:-sudoers.lan}
-      HOST_IP: ${HOST_IP:-192.168.1.10}
+      DHCP_ROUTER: ${DHCP_ROUTER:-${HOST_IP:-192.168.1.10}}
     volumes:
       - dhcp_state:/var/lib/kea
     networks:
-      - tso-net
+      lan:
+        ipv4_address: ${DHCP_IP:-192.168.1.10}
 
   # ------------------------------------------------------------------
   # Base de datos (PostgreSQL) — Nicolás
@@ -263,6 +263,16 @@ volumes:
 networks:
   tso-net:
     driver: bridge
+  # Red macvlan para el DHCP: conecta el contenedor directo a la LAN física
+  # (parent = interfaz del server, ej: wlo1) para recibir broadcasts DHCP.
+  lan:
+    driver: macvlan
+    driver_opts:
+      parent: ${DHCP_INTERFACE:-wlo1}
+    ipam:
+      config:
+        - subnet: ${DHCP_SUBNET:-192.168.1.0/24}
+          gateway: ${DHCP_ROUTER:-192.168.1.1}
 
 # NOTA sobre IIS y controlador de dominio:
 # IIS y un controlador de dominio con Active Directory son tecnologías de
