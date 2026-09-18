@@ -91,7 +91,7 @@ options {
     recursion yes;
     allow-query { any; };
     dnssec-validation auto;
-    forwarders { 192.168.0.1; 1.1.1.1; };
+    forwarders { 1.1.1.1; 8.8.8.8; };
 };
 EOF
 
