@@ -19,6 +19,11 @@ CONF="/etc/kea/kea-dhcp4.conf"
 mkdir -p /run/kea /var/lib/kea
 chown -R _kea:_kea /run/kea /var/lib/kea
 
+# Limpiar PID file obsoleto: Kea es PID 1 del contenedor, y si el contenedor
+# se apagó sin shutdown limpio (/run no es tmpfs) queda un PID file con "1"
+# que Kea interpreta como "ya hay otra instancia corriendo" (DHCP4_ALREADY_RUNNING).
+rm -f /run/kea/kea-dhcp4.kea-dhcp4.pid
+
 # Reemplazar tokens de la plantilla
 sed -i \
     -e "s|__DHCP_SUBNET__|${SUB}|g" \
